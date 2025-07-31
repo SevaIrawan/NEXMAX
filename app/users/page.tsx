@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import Sidebar from '@/components/Sidebar'
+import SubHeader from '@/components/SubHeader'
 import { supabase } from '@/lib/supabase'
 
 interface User {
@@ -237,63 +238,44 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header 
-        user={user} 
-        darkMode={darkMode} 
-        onToggleDarkMode={handleToggleDarkMode} 
-        onLogout={handleLogout}
-        sidebarExpanded={sidebarExpanded}
-        setSidebarExpanded={setSidebarExpanded}
-      />
-      
-      <div className="flex" style={{ marginTop: '70px' }}>
-        <Sidebar user={user} onExpandedChange={setSidebarExpanded} />
+    <div className="app-layout">
+      <Sidebar user={user} onExpandedChange={setSidebarExpanded} />
+      <div className={`main-content ${sidebarExpanded ? 'sidebar-expanded' : 'sidebar-collapsed'}`}>
+        <Header 
+          user={user} 
+          darkMode={darkMode} 
+          onToggleDarkMode={handleToggleDarkMode} 
+          onLogout={handleLogout}
+          sidebarExpanded={sidebarExpanded}
+          setSidebarExpanded={setSidebarExpanded}
+        />
         
-        <main className="flex-1">
-          {/* SUB HEADER - STANDARD SIZE */}
-          <div style={{
-            position: 'fixed',
-            top: '70px',
-            left: sidebarExpanded ? '280px' : '75px',
-            right: '0',
-            minHeight: '80px',
-            background: 'white',
-            borderBottom: '1px solid #e2e8f0',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '15px 48px',
-            zIndex: 1000,
-            transition: 'left 0.3s ease',
-            overflow: 'hidden'
-          }}>
-            <div style={{ 
-              margin: 0, 
-              fontSize: '1.5rem', 
-              fontWeight: '700',
-              color: '#1e293b'
-            }}>
-              User Management
-            </div>
-            
-            <div style={{ 
-              display: 'flex', 
-              gap: '16px', 
-              alignItems: 'center' 
-            }}>
-              <button 
-                onClick={() => setShowModal(true)}
-                className="add-user-btn"
-              >
-                Add New User
-              </button>
-            </div>
-          </div>
-
-          <div style={{ marginTop: '150px', padding: '24px' }}>
+        <SubHeader 
+          title="User Management"
+          year={2025}
+          setYear={() => {}}
+          currency="USD"
+          setCurrency={() => {}}
+          month={1}
+          setMonth={() => {}}
+          showMonthSlicer={false}
+        />
+        
+        <main className="scrollable-content">
+          <div className="dashboard-content">
             <div className="users-table-container">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#1f2937', margin: 0 }}>
+                  Users List
+                </h2>
+                <button 
+                  onClick={() => setShowModal(true)}
+                  className="add-user-btn"
+                >
+                  Add New User
+                </button>
+              </div>
+              
               <table className="users-table">
                 <thead>
                   <tr>
@@ -360,91 +342,91 @@ export default function UsersPage() {
                 </tbody>
               </table>
             </div>
+
+            {/* Add User Modal */}
+            {showModal && (
+              <div className="modal-overlay">
+                <div className="modal">
+                  <h3>Add New User</h3>
+                  <form onSubmit={handleAddUser}>
+                    <input
+                      type="text"
+                      placeholder="Username"
+                      value={formData.username}
+                      onChange={(e) => setFormData({...formData, username: e.target.value})}
+                      required
+                    />
+                    <input
+                      type="password"
+                      placeholder="Password"
+                      value={formData.password}
+                      onChange={(e) => setFormData({...formData, password: e.target.value})}
+                      required
+                    />
+                    <select 
+                      value={formData.role}
+                      onChange={(e) => setFormData({...formData, role: e.target.value})}
+                    >
+                      <option value="user">User</option>
+                      <option value="admin">Admin</option>
+                      <option value="manager">Manager</option>
+                      <option value="executive">Executive</option>
+                      <option value="operator">Operator</option>
+                    </select>
+                    <div className="modal-actions">
+                      <button type="submit">Add User</button>
+                      <button type="button" onClick={() => setShowModal(false)}>Cancel</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {/* Edit User Modal */}
+            {showEditModal && editingUser && (
+              <div className="modal-overlay">
+                <div className="modal">
+                  <h3>Edit User</h3>
+                  <form onSubmit={handleUpdateUser}>
+                    <input
+                      type="text"
+                      placeholder="Username"
+                      value={editingUser.username}
+                      onChange={(e) => setEditingUser({...editingUser, username: e.target.value})}
+                      required
+                    />
+                    <input
+                      type="email"
+                      placeholder="Email (optional)"
+                      value={editingUser.email || ''}
+                      onChange={(e) => setEditingUser({...editingUser, email: e.target.value})}
+                    />
+                    <input
+                      type="password"
+                      placeholder="New Password"
+                      value={editingUser.password}
+                      onChange={(e) => setEditingUser({...editingUser, password: e.target.value})}
+                      required
+                    />
+                    <select
+                      value={editingUser.role}
+                      onChange={(e) => setEditingUser({...editingUser, role: e.target.value})}
+                    >
+                      <option value="user">User</option>
+                      <option value="admin">Admin</option>
+                      <option value="manager">Manager</option>
+                      <option value="executive">Executive</option>
+                      <option value="operator">Operator</option>
+                    </select>
+                    <div className="modal-actions">
+                      <button type="submit">Update User</button>
+                      <button type="button" onClick={() => setShowEditModal(false)}>Cancel</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
           </div>
-
-          {/* Add User Modal */}
-          {showModal && (
-            <div className="modal-overlay">
-              <div className="modal">
-                <h3>Add New User</h3>
-                <form onSubmit={handleAddUser}>
-                  <input
-                    type="text"
-                    placeholder="Username"
-                    value={formData.username}
-                    onChange={(e) => setFormData({...formData, username: e.target.value})}
-                    required
-                  />
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({...formData, password: e.target.value})}
-                    required
-                  />
-                  <select 
-                    value={formData.role}
-                    onChange={(e) => setFormData({...formData, role: e.target.value})}
-                  >
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                    <option value="manager">Manager</option>
-                    <option value="executive">Executive</option>
-                    <option value="operator">Operator</option>
-                  </select>
-                  <div className="modal-actions">
-                    <button type="submit">Add User</button>
-                    <button type="button" onClick={() => setShowModal(false)}>Cancel</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* Edit User Modal */}
-          {showEditModal && editingUser && (
-            <div className="modal-overlay">
-              <div className="modal">
-                <h3>Edit User</h3>
-                <form onSubmit={handleUpdateUser}>
-                  <input
-                    type="text"
-                    placeholder="Username"
-                    value={editingUser.username}
-                    onChange={(e) => setEditingUser({...editingUser, username: e.target.value})}
-                    required
-                  />
-                  <input
-                    type="email"
-                    placeholder="Email (optional)"
-                    value={editingUser.email || ''}
-                    onChange={(e) => setEditingUser({...editingUser, email: e.target.value})}
-                  />
-                  <input
-                    type="password"
-                    placeholder="New Password"
-                    value={editingUser.password}
-                    onChange={(e) => setEditingUser({...editingUser, password: e.target.value})}
-                    required
-                  />
-                  <select
-                    value={editingUser.role}
-                    onChange={(e) => setEditingUser({...editingUser, role: e.target.value})}
-                  >
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                    <option value="manager">Manager</option>
-                    <option value="executive">Executive</option>
-                    <option value="operator">Operator</option>
-                  </select>
-                  <div className="modal-actions">
-                    <button type="submit">Update User</button>
-                    <button type="button" onClick={() => setShowEditModal(false)}>Cancel</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
         </main>
       </div>
 
@@ -537,6 +519,7 @@ export default function UsersPage() {
           border-radius: 12px;
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
           overflow: hidden;
+          padding: 20px;
         }
         
         .users-table {
