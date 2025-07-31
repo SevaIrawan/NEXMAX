@@ -53,4 +53,118 @@
   body {
     @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-white;
   }
+}
+
+/* IMPROVED LAYOUT STYLES - NO GAPS, FLEXIBLE AND CLEAN */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.main-content {
+  flex: 1;
+  position: relative;
+  min-height: 100vh;
+  transition: margin-left 0.3s ease;
+  margin-left: 280px; /* Default expanded state */
+}
+
+.main-content.sidebar-collapsed {
+  margin-left: 75px;
+}
+
+.scrollable-content {
+  height: calc(100vh - 140px); /* Account for header + subheader */
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0;
+  margin: 0;
+}
+
+.dashboard-content {
+  padding: 24px;
+  margin: 0;
+}
+
+/* IMPROVED SUB HEADER STYLES */
+.dashboard-header-fixed {
+  position: fixed;
+  top: 70px;
+  left: 280px; /* Align with sidebar when expanded */
+  right: 0;
+  min-height: 70px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 48px;
+  z-index: 1000;
+  transition: left 0.3s ease;
+}
+
+.main-content.sidebar-collapsed .dashboard-header-fixed {
+  left: 75px;
+}
+
+.dashboard-subtitle {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.slicer-controls {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  height: 100%;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  white-space: nowrap;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 1024px) {
+  .main-content {
+    margin-left: 75px;
+  }
+  
+  .dashboard-header-fixed {
+    left: 75px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0 !important;
+  }
+  
+  .dashboard-header-fixed {
+    left: 0;
+    padding: 15px 24px;
+  }
+  
+  .slicer-controls {
+    gap: 12px;
+  }
+  
+  .filter-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
 } 
