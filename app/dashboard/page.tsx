@@ -441,25 +441,29 @@ export default function Dashboard() {
           .charts-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 16px;
             margin-bottom: 0px;
             margin-top: 0px;
+            width: 100%;
+            max-width: 100%;
           }
 
           @media (max-width: 1024px) {
             .charts-grid {
               grid-template-columns: 1fr;
-              gap: 15px;
+              gap: 12px;
             }
           }
 
           .chart-container {
             background: white;
-            padding: 24px 28px;
+            padding: 20px;
             border-radius: 10px;
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
             border: 1px solid #e2e8f0;
             min-height: 380px;
+            width: 100%;
+            box-sizing: border-box;
           }
 
           .line-charts-section {

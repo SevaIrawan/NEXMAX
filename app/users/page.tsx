@@ -309,13 +309,13 @@ export default function UsersPage() {
                 <tbody>
                   {loading ? (
                     <tr>
-                      <td colSpan="7" style={{ textAlign: 'center', padding: '20px' }}>
+                      <td colSpan={7} style={{ textAlign: 'center', padding: '20px' }}>
                         Loading users...
                       </td>
                     </tr>
                   ) : users.length === 0 ? (
                     <tr>
-                      <td colSpan="7" style={{ textAlign: 'center', padding: '20px' }}>
+                      <td colSpan={7} style={{ textAlign: 'center', padding: '20px' }}>
                         No users found
                       </td>
                     </tr>

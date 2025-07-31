@@ -144,7 +144,7 @@ export default function StrategicExecutive() {
     return {
       netProfit: netProfit,
       netProfitChange: -24.8, // Mock change percentage
-      ggrUser: ggrUser.toFixed(2),
+      ggrUser: ggrUser, // Return as number, not string
       ggrUserChange: -13.68, // Mock change percentage
       activeMember: activeMembers,
       activeMemberChange: -13.18, // Mock change percentage
@@ -270,7 +270,7 @@ export default function StrategicExecutive() {
                   GGR User
                 </h3>
                 <div className="kpi-value" style={{ color: '#000000' }}>
-                  {loading ? '...' : strategicData.ggrUser}
+                  {loading ? '...' : strategicData.ggrUser.toFixed(2)}
                 </div>
                 <div className={`kpi-change ${strategicData.ggrUserChange >= 0 ? 'positive' : 'negative'}`}>
                   {strategicData.ggrUserChange >= 0 ? '+' : ''}{strategicData.ggrUserChange}% vs last month
@@ -329,14 +329,16 @@ export default function StrategicExecutive() {
 
           {/* CHARTS SECTION - 2-2-1 LAYOUT */}
           {/* BARIS 1: 2 Line Charts */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px', width: '100%', maxWidth: '100%' }}>
             {/* GGR User Trend Chart */}
             <div style={{
               backgroundColor: 'white',
-              padding: '24px',
+              padding: '20px',
               borderRadius: '12px',
               border: '1px solid #e5e7eb',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+              width: '100%',
+              boxSizing: 'border-box'
             }}>
               <h3 style={{ 
                 fontSize: '18px', 
@@ -360,10 +362,12 @@ export default function StrategicExecutive() {
             {/* GGR Pure User Trend Chart */}
             <div style={{
               backgroundColor: 'white',
-              padding: '24px',
+              padding: '20px',
               borderRadius: '12px',
               border: '1px solid #e5e7eb',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+              width: '100%',
+              boxSizing: 'border-box'
             }}>
               <h3 style={{ 
                 fontSize: '18px', 
@@ -386,14 +390,16 @@ export default function StrategicExecutive() {
           </div>
 
           {/* BARIS 2: 2 Line Charts */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px', width: '100%', maxWidth: '100%' }}>
             {/* Customer Value per Headcount Chart */}
             <div style={{
               backgroundColor: 'white',
-              padding: '24px',
+              padding: '20px',
               borderRadius: '12px',
               border: '1px solid #e5e7eb',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+              width: '100%',
+              boxSizing: 'border-box'
             }}>
               <h3 style={{ 
                 fontSize: '18px', 
@@ -417,10 +423,12 @@ export default function StrategicExecutive() {
             {/* Customer Count vs Headcount Chart */}
             <div style={{
               backgroundColor: 'white',
-              padding: '24px',
+              padding: '20px',
               borderRadius: '12px',
               border: '1px solid #e5e7eb',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+              width: '100%',
+              boxSizing: 'border-box'
             }}>
               <h3 style={{ 
                 fontSize: '18px', 
@@ -445,10 +453,12 @@ export default function StrategicExecutive() {
           {/* BARIS 3: 1 Bar Chart (Full Width) */}
           <div style={{
             backgroundColor: 'white',
-            padding: '24px',
+            padding: '20px',
             borderRadius: '12px',
             border: '1px solid #e5e7eb',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+            width: '100%',
+            boxSizing: 'border-box'
           }}>
             <h3 style={{ 
               fontSize: '18px', 
