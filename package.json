@@ -1,0 +1,27 @@
+{
+  "name": "nexmax-dashboard",
+  "version": "1.0.0",
+  "description": "NexMax Dashboard - Interactive Dashboard with Username-based Authentication",
+  "main": "login.html",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static site - no build required'",
+    "start": "vercel dev"
+  },
+  "keywords": [
+    "dashboard",
+    "html",
+    "css",
+    "javascript",
+    "supabase",
+    "authentication",
+    "charts"
+  ],
+  "author": "SevaIrawan",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SevaIrawan/NEXMAX.git"
+  },
+  "homepage": "https://nexmax-dashboard.vercel.app"
+} 
