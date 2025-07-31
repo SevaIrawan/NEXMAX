@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Header from '@/components/Header'
-import Sidebar from '@/components/Sidebar'
+import Layout from '@/components/Layout'
 import SubHeader from '@/components/SubHeader'
 
 export default function BusinessFlowPage() {
@@ -63,46 +62,37 @@ export default function BusinessFlowPage() {
   }
 
   return (
-    <div className="app-layout">
-      <Sidebar user={user} onExpandedChange={setSidebarExpanded} />
-      <div className={`main-content ${sidebarExpanded ? 'sidebar-expanded' : 'sidebar-collapsed'}`}>
-        <Header 
-          user={user} 
-          darkMode={darkMode} 
-          onToggleDarkMode={handleToggleDarkMode} 
-          onLogout={handleLogout}
-          sidebarExpanded={sidebarExpanded}
-          setSidebarExpanded={setSidebarExpanded}
-        />
-        
-        <SubHeader 
-          title="Business Flow"
-          year={year}
-          setYear={setYear}
-          currency={currency}
-          setCurrency={setCurrency}
-          month={month}
-          setMonth={setMonth}
-        />
-        
-        <main className="scrollable-content">
-          <div className="dashboard-content">
-            <div className="text-center" style={{ marginTop: '50px' }}>
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                🚧 Coming Soon
-              </h1>
-              <p className="text-xl text-gray-600 mb-8">
-                Business Flow Dashboard sedang dalam pengembangan
-              </p>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-md mx-auto">
-                <p className="text-blue-800">
-                  Fitur ini akan segera hadir dengan analisis alur bisnis yang komprehensif.
-                </p>
-              </div>
-            </div>
-          </div>
-        </main>
+    <Layout
+      user={user}
+      darkMode={darkMode}
+      sidebarExpanded={sidebarExpanded}
+      setSidebarExpanded={setSidebarExpanded}
+      onToggleDarkMode={handleToggleDarkMode}
+      onLogout={handleLogout}
+    >
+      <SubHeader 
+        title="Business Flow Dashboard"
+        year={year}
+        setYear={setYear}
+        currency={currency}
+        setCurrency={setCurrency}
+        month={month}
+        setMonth={setMonth}
+      />
+      
+      <div className="text-center" style={{ marginTop: '50px' }}>
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          🚧 Coming Soon
+        </h1>
+        <p className="text-xl text-gray-600 mb-8">
+          Business Flow Dashboard sedang dalam pengembangan
+        </p>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-md mx-auto">
+          <p className="text-blue-800">
+            Fitur ini akan segera hadir dengan dashboard business flow yang lengkap.
+          </p>
+        </div>
       </div>
-    </div>
+    </Layout>
   )
 } 

@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Header from '@/components/Header'
-import Sidebar from '@/components/Sidebar'
+import Layout from '@/components/Layout'
 import SubHeader from '@/components/SubHeader'
 import { supabase } from '@/lib/supabase'
 
@@ -121,27 +120,23 @@ export default function UsersPage() {
 
       if (error) {
         console.error('❌ Error adding user:', error)
-        alert('Error adding user: ' + error.message)
+        alert('Failed to add user')
       } else {
         console.log('✅ User added successfully:', data)
         setFormData({ username: '', password: '', role: 'user' })
         setShowModal(false)
         fetchUsers() // Refresh the list
-        alert('User created successfully!')
       }
     } catch (error) {
-      console.error('Error creating user:', error)
-      alert('Network error. Please try again.')
+      console.error('❌ Error adding user:', error)
+      alert('Failed to add user')
     }
   }
 
   const handleEditUser = (userToEdit: User) => {
     setEditingUser({
-      id: userToEdit.id,
-      username: userToEdit.username,
-      email: userToEdit.email || '',
-      password: userToEdit.password,
-      role: userToEdit.role
+      ...userToEdit,
+      password: '' // Don't show current password
     })
     setShowEditModal(true)
   }
@@ -153,36 +148,39 @@ export default function UsersPage() {
     try {
       console.log('✏️ Updating user:', editingUser)
       
+      const updateData: any = {
+        username: editingUser.username,
+        role: editingUser.role
+      }
+      
+      // Only update password if provided
+      if (editingUser.password) {
+        updateData.password = editingUser.password
+      }
+
       const { data, error } = await supabase
         .from('users')
-        .update({
-          username: editingUser.username,
-          password: editingUser.password,
-          role: editingUser.role
-        })
+        .update(updateData)
         .eq('id', editingUser.id)
         .select()
 
       if (error) {
         console.error('❌ Error updating user:', error)
-        alert('Error updating user: ' + error.message)
+        alert('Failed to update user')
       } else {
         console.log('✅ User updated successfully:', data)
-        setEditingUser(null)
         setShowEditModal(false)
+        setEditingUser(null)
         fetchUsers() // Refresh the list
-        alert('User updated successfully!')
       }
     } catch (error) {
-      console.error('Error updating user:', error)
-      alert('Network error. Please try again.')
+      console.error('❌ Error updating user:', error)
+      alert('Failed to update user')
     }
   }
 
   const handleDeleteUser = async (userId: string) => {
-    if (!window.confirm('Are you sure you want to delete this user?')) {
-      return
-    }
+    if (!confirm('Are you sure you want to delete this user?')) return
 
     try {
       console.log('🗑️ Deleting user:', userId)
@@ -194,42 +192,39 @@ export default function UsersPage() {
 
       if (error) {
         console.error('❌ Error deleting user:', error)
-        alert('Error deleting user: ' + error.message)
+        alert('Failed to delete user')
       } else {
         console.log('✅ User deleted successfully')
         fetchUsers() // Refresh the list
-        alert('User deleted successfully!')
       }
     } catch (error) {
-      console.error('Error deleting user:', error)
-      alert('Network error. Please try again.')
+      console.error('❌ Error deleting user:', error)
+      alert('Failed to delete user')
     }
   }
 
   const handleResetPassword = async (userId: string) => {
-    const newPassword = prompt('Enter new password:')
-    if (!newPassword) return
+    if (!confirm('Are you sure you want to reset this user\'s password?')) return
 
     try {
-      console.log('🔐 Resetting password for user:', userId)
+      console.log('🔑 Resetting password for user:', userId)
       
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('users')
-        .update({ password: newPassword })
+        .update({ password: 'Reset123!' })
         .eq('id', userId)
-        .select()
 
       if (error) {
         console.error('❌ Error resetting password:', error)
-        alert('Error resetting password: ' + error.message)
+        alert('Failed to reset password')
       } else {
-        console.log('✅ Password reset successfully:', data)
+        console.log('✅ Password reset successfully')
+        alert('Password has been reset to: Reset123!')
         fetchUsers() // Refresh the list
-        alert('Password reset successfully!')
       }
     } catch (error) {
-      console.error('Error resetting password:', error)
-      alert('Network error. Please try again.')
+      console.error('❌ Error resetting password:', error)
+      alert('Failed to reset password')
     }
   }
 
@@ -238,217 +233,302 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="app-layout">
-      <Sidebar user={user} onExpandedChange={setSidebarExpanded} />
-      <div className={`main-content ${sidebarExpanded ? 'sidebar-expanded' : 'sidebar-collapsed'}`}>
-        <Header 
-          user={user} 
-          darkMode={darkMode} 
-          onToggleDarkMode={handleToggleDarkMode} 
-          onLogout={handleLogout}
-          sidebarExpanded={sidebarExpanded}
-          setSidebarExpanded={setSidebarExpanded}
-        />
+    <Layout
+      user={user}
+      darkMode={darkMode}
+      sidebarExpanded={sidebarExpanded}
+      setSidebarExpanded={setSidebarExpanded}
+      onToggleDarkMode={handleToggleDarkMode}
+      onLogout={handleLogout}
+    >
+      <SubHeader 
+        title="User Management"
+        year={2025}
+        setYear={() => {}}
+        currency="USD"
+        setCurrency={() => {}}
+        month={1}
+        setMonth={() => {}}
+        showMonthSlicer={false}
+      />
+      
+      <div className="table-container">
+        <div className="table-header">
+          <h2 className="table-title">Users List</h2>
+          <button 
+            onClick={() => setShowModal(true)}
+            className="add-user-btn"
+          >
+            Add New User
+          </button>
+        </div>
         
-        <SubHeader 
-          title="User Management"
-          year={2025}
-          setYear={() => {}}
-          currency="USD"
-          setCurrency={() => {}}
-          month={1}
-          setMonth={() => {}}
-          showMonthSlicer={false}
-        />
-        
-        <main className="scrollable-content">
-          <div className="dashboard-content">
-            <div className="users-table-container">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#1f2937', margin: 0 }}>
-                  Users List
-                </h2>
-                <button 
-                  onClick={() => setShowModal(true)}
-                  className="add-user-btn"
-                >
-                  Add New User
-                </button>
-              </div>
-              
-              <table className="users-table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Username</th>
-                    <th>Password</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Created</th>
-                    <th>Actions</th>
+        <div style={{ padding: '20px' }}>
+          <table className="users-table">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Created At</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: 'center', padding: '20px' }}>
+                    Loading users...
+                  </td>
+                </tr>
+              ) : users.length === 0 ? (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: 'center', padding: '20px' }}>
+                    No users found
+                  </td>
+                </tr>
+              ) : (
+                users.map((user) => (
+                  <tr key={user.id}>
+                    <td>{user.username}</td>
+                    <td>{user.email || '-'}</td>
+                    <td>
+                      <span className={`role-badge role-${user.role}`}>
+                        {user.role}
+                      </span>
+                    </td>
+                    <td>{user.created_at ? new Date(user.created_at).toLocaleDateString() : '-'}</td>
+                    <td>
+                      <div className="action-buttons">
+                        <button 
+                          onClick={() => handleEditUser(user)}
+                          className="edit-btn"
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          onClick={() => handleResetPassword(user.id)}
+                          className="reset-btn"
+                        >
+                          Reset Password
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteUser(user.id)}
+                          className="delete-btn"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {loading ? (
-                    <tr>
-                      <td colSpan={7} style={{ textAlign: 'center', padding: '20px' }}>
-                        Loading users...
-                      </td>
-                    </tr>
-                  ) : users.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} style={{ textAlign: 'center', padding: '20px' }}>
-                        No users found
-                      </td>
-                    </tr>
-                  ) : (
-                    users.map((user) => (
-                      <tr key={user.id}>
-                        <td>{user.id}</td>
-                        <td>{user.username}</td>
-                        <td>{user.password}</td>
-                        <td>{user.email || 'N/A'}</td>
-                        <td>
-                          <span className={`role-badge ${user.role.toLowerCase()}`}>
-                            {user.role.toUpperCase()}
-                          </span>
-                        </td>
-                        <td>{user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</td>
-                        <td>
-                          <div className="action-buttons">
-                            <button 
-                              onClick={() => handleEditUser(user)}
-                              className="btn-edit"
-                            >
-                              Edit
-                            </button>
-                            <button 
-                              onClick={() => handleResetPassword(user.id)}
-                              className="btn-reset"
-                            >
-                              Reset
-                            </button>
-                            <button 
-                              onClick={() => handleDeleteUser(user.id)}
-                              className="btn-delete"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Add User Modal */}
-            {showModal && (
-              <div className="modal-overlay">
-                <div className="modal">
-                  <h3>Add New User</h3>
-                  <form onSubmit={handleAddUser}>
-                    <input
-                      type="text"
-                      placeholder="Username"
-                      value={formData.username}
-                      onChange={(e) => setFormData({...formData, username: e.target.value})}
-                      required
-                    />
-                    <input
-                      type="password"
-                      placeholder="Password"
-                      value={formData.password}
-                      onChange={(e) => setFormData({...formData, password: e.target.value})}
-                      required
-                    />
-                    <select 
-                      value={formData.role}
-                      onChange={(e) => setFormData({...formData, role: e.target.value})}
-                    >
-                      <option value="user">User</option>
-                      <option value="admin">Admin</option>
-                      <option value="manager">Manager</option>
-                      <option value="executive">Executive</option>
-                      <option value="operator">Operator</option>
-                    </select>
-                    <div className="modal-actions">
-                      <button type="submit">Add User</button>
-                      <button type="button" onClick={() => setShowModal(false)}>Cancel</button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            )}
-
-            {/* Edit User Modal */}
-            {showEditModal && editingUser && (
-              <div className="modal-overlay">
-                <div className="modal">
-                  <h3>Edit User</h3>
-                  <form onSubmit={handleUpdateUser}>
-                    <input
-                      type="text"
-                      placeholder="Username"
-                      value={editingUser.username}
-                      onChange={(e) => setEditingUser({...editingUser, username: e.target.value})}
-                      required
-                    />
-                    <input
-                      type="email"
-                      placeholder="Email (optional)"
-                      value={editingUser.email || ''}
-                      onChange={(e) => setEditingUser({...editingUser, email: e.target.value})}
-                    />
-                    <input
-                      type="password"
-                      placeholder="New Password"
-                      value={editingUser.password}
-                      onChange={(e) => setEditingUser({...editingUser, password: e.target.value})}
-                      required
-                    />
-                    <select
-                      value={editingUser.role}
-                      onChange={(e) => setEditingUser({...editingUser, role: e.target.value})}
-                    >
-                      <option value="user">User</option>
-                      <option value="admin">Admin</option>
-                      <option value="manager">Manager</option>
-                      <option value="executive">Executive</option>
-                      <option value="operator">Operator</option>
-                    </select>
-                    <div className="modal-actions">
-                      <button type="submit">Update User</button>
-                      <button type="button" onClick={() => setShowEditModal(false)}>Cancel</button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            )}
-          </div>
-        </main>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
+      {/* Add User Modal */}
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Add New User</h3>
+            <form onSubmit={handleAddUser}>
+              <input
+                type="text"
+                placeholder="Username"
+                value={formData.username}
+                onChange={(e) => setFormData({...formData, username: e.target.value})}
+                required
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                required
+              />
+              <select 
+                value={formData.role}
+                onChange={(e) => setFormData({...formData, role: e.target.value})}
+              >
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+                <option value="manager">Manager</option>
+                <option value="executive">Executive</option>
+                <option value="operator">Operator</option>
+              </select>
+              <div className="modal-actions">
+                <button type="submit">Add User</button>
+                <button type="button" onClick={() => setShowModal(false)}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit User Modal */}
+      {showEditModal && editingUser && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Edit User</h3>
+            <form onSubmit={handleUpdateUser}>
+              <input
+                type="text"
+                placeholder="Username"
+                value={editingUser.username}
+                onChange={(e) => setEditingUser({...editingUser, username: e.target.value})}
+                required
+              />
+              <input
+                type="email"
+                placeholder="Email (optional)"
+                value={editingUser.email || ''}
+                onChange={(e) => setEditingUser({...editingUser, email: e.target.value})}
+              />
+              <input
+                type="password"
+                placeholder="New Password"
+                value={editingUser.password}
+                onChange={(e) => setEditingUser({...editingUser, password: e.target.value})}
+                required
+              />
+              <select
+                value={editingUser.role}
+                onChange={(e) => setEditingUser({...editingUser, role: e.target.value})}
+              >
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+                <option value="manager">Manager</option>
+                <option value="executive">Executive</option>
+                <option value="operator">Operator</option>
+              </select>
+              <div className="modal-actions">
+                <button type="submit">Update User</button>
+                <button type="button" onClick={() => setShowEditModal(false)}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <style jsx>{`
+        .users-table {
+          width: 100%;
+          border-collapse: collapse;
+          background: white;
+          border-radius: 8px;
+          overflow: hidden;
+        }
+
+        .users-table th,
+        .users-table td {
+          padding: 12px 16px;
+          text-align: left;
+          border-bottom: 1px solid #e5e7eb;
+        }
+
+        .users-table th {
+          background: #f8f9fa;
+          font-weight: 600;
+          color: #374151;
+        }
+
+        .users-table tr:hover {
+          background: #f9fafb;
+        }
+
+        .role-badge {
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 12px;
+          font-weight: 500;
+          text-transform: uppercase;
+        }
+
+        .role-admin {
+          background: #fee2e2;
+          color: #dc2626;
+        }
+
+        .role-manager {
+          background: #dbeafe;
+          color: #2563eb;
+        }
+
+        .role-executive {
+          background: #fef3c7;
+          color: #d97706;
+        }
+
+        .role-operator {
+          background: #d1fae5;
+          color: #059669;
+        }
+
+        .role-user {
+          background: #f3f4f6;
+          color: #374151;
+        }
+
+        .action-buttons {
+          display: flex;
+          gap: 8px;
+        }
+
+        .edit-btn,
+        .reset-btn,
+        .delete-btn {
+          padding: 6px 12px;
+          border: none;
+          border-radius: 4px;
+          font-size: 12px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .edit-btn {
+          background: #3b82f6;
+          color: white;
+        }
+
+        .reset-btn {
+          background: #f59e0b;
+          color: white;
+        }
+
+        .delete-btn {
+          background: #ef4444;
+          color: white;
+        }
+
+        .edit-btn:hover {
+          background: #2563eb;
+        }
+
+        .reset-btn:hover {
+          background: #d97706;
+        }
+
+        .delete-btn:hover {
+          background: #dc2626;
+        }
+
         .add-user-btn {
-          background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+          background: #10b981;
           color: white;
           border: none;
-          padding: 12px 24px;
-          border-radius: 8px;
+          padding: 10px 20px;
+          border-radius: 6px;
+          font-weight: 500;
           cursor: pointer;
-          font-weight: 600;
-          font-size: 1rem;
-          box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-          transition: all 0.3s ease;
+          transition: all 0.2s;
         }
-        
+
         .add-user-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+          background: #059669;
         }
-        
+
         .modal-overlay {
           position: fixed;
           top: 0;
@@ -457,162 +537,60 @@ export default function UsersPage() {
           bottom: 0;
           background: rgba(0, 0, 0, 0.5);
           display: flex;
-          justify-content: center;
           align-items: center;
-          z-index: 9999;
+          justify-content: center;
+          z-index: 1000;
         }
-        
+
         .modal {
           background: white;
-          padding: 30px;
-          border-radius: 12px;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+          padding: 24px;
+          border-radius: 8px;
           width: 400px;
           max-width: 90vw;
         }
-        
+
         .modal h3 {
           margin: 0 0 20px 0;
-          color: #1f2937;
-          font-size: 1.5rem;
-          font-weight: 700;
+          font-size: 18px;
+          font-weight: 600;
         }
-        
-        .modal input, .modal select {
+
+        .modal input,
+        .modal select {
           width: 100%;
-          padding: 12px;
-          margin: 8px 0;
+          padding: 10px;
           border: 1px solid #d1d5db;
-          border-radius: 6px;
-          font-size: 1rem;
-          box-sizing: border-box;
+          border-radius: 4px;
+          margin-bottom: 12px;
+          font-size: 14px;
         }
-        
+
         .modal-actions {
           display: flex;
-          gap: 10px;
+          gap: 12px;
+          justify-content: flex-end;
           margin-top: 20px;
         }
-        
+
         .modal-actions button {
-          flex: 1;
-          padding: 12px;
+          padding: 8px 16px;
           border: none;
-          border-radius: 6px;
+          border-radius: 4px;
           cursor: pointer;
-          font-weight: 600;
-          font-size: 1rem;
+          font-size: 14px;
         }
-        
+
         .modal-actions button[type="submit"] {
           background: #10b981;
           color: white;
         }
-        
+
         .modal-actions button[type="button"] {
           background: #6b7280;
           color: white;
         }
-        
-        .users-table-container {
-          background: white;
-          border-radius: 12px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-          overflow: hidden;
-          padding: 20px;
-        }
-        
-        .users-table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-        
-        .users-table th {
-          background: #f8f9fa;
-          padding: 15px;
-          text-align: left;
-          font-weight: 600;
-          color: #374151;
-          border-bottom: 1px solid #e5e7eb;
-        }
-        
-        .users-table td {
-          padding: 15px;
-          border-bottom: 1px solid #f3f4f6;
-          color: #374151;
-        }
-        
-        .users-table tr:hover {
-          background: #f9fafb;
-        }
-        
-        .role-badge {
-          padding: 4px 12px;
-          border-radius: 20px;
-          font-size: 0.8rem;
-          font-weight: 600;
-          text-transform: uppercase;
-        }
-        
-        .role-badge.admin {
-          background: #fecaca;
-          color: #dc2626;
-        }
-        
-        .role-badge.manager {
-          background: #fef3c7;
-          color: #d97706;
-        }
-        
-        .role-badge.executive {
-          background: #fef3c7;
-          color: #d97706;
-        }
-        
-        .role-badge.operator {
-          background: #d1fae5;
-          color: #059669;
-        }
-        
-        .role-badge.user {
-          background: #d1fae5;
-          color: #059669;
-        }
-        
-        .action-buttons {
-          display: flex;
-          gap: 8px;
-        }
-        
-        .action-buttons button {
-          padding: 6px 12px;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 0.9rem;
-          font-weight: 600;
-        }
-        
-        .btn-edit {
-          background: #10b981;
-          color: white;
-        }
-        
-        .btn-reset {
-          background: #3b82f6;
-          color: white;
-        }
-        
-        .btn-delete {
-          background: #ef4444;
-          color: white;
-        }
-        
-        .action-buttons button:hover {
-          opacity: 0.8;
-          transform: translateY(-1px);
-        }
       `}</style>
-    </div>
+    </Layout>
   )
 } 

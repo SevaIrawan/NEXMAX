@@ -12,39 +12,26 @@ interface SubHeaderProps {
 }
 
 // Placeholder components untuk slicers
-const CurrencySlicer = ({ value, onChange }: { value: string; onChange: (value: string) => void }) => (
-  <select 
-    value={value} 
-    onChange={(e) => onChange(e.target.value)}
-    style={{
-      padding: '8px 12px',
-      border: '1px solid #d1d5db',
-      borderRadius: '6px',
-      fontSize: '14px',
-      backgroundColor: 'white'
-    }}
-  >
-    <option value="USD">USD</option>
-    <option value="MYR">MYR</option>
-    <option value="SGD">SGD</option>
-  </select>
-)
-
 const YearSlicer = ({ value, onChange }: { value: number; onChange: (value: number) => void }) => (
   <select 
     value={value} 
     onChange={(e) => onChange(Number(e.target.value))}
-    style={{
-      padding: '8px 12px',
-      border: '1px solid #d1d5db',
-      borderRadius: '6px',
-      fontSize: '14px',
-      backgroundColor: 'white'
-    }}
+    className="filter-select"
   >
-    <option value={2023}>2023</option>
     <option value={2024}>2024</option>
     <option value={2025}>2025</option>
+  </select>
+)
+
+const CurrencySlicer = ({ value, onChange }: { value: string; onChange: (value: string) => void }) => (
+  <select 
+    value={value} 
+    onChange={(e) => onChange(e.target.value)}
+    className="filter-select"
+  >
+    <option value="MYR">MYR</option>
+    <option value="SGD">SGD</option>
+    <option value="USD">USD</option>
   </select>
 )
 
@@ -52,13 +39,7 @@ const MonthSlicer = ({ value, onChange }: { value: number; onChange: (value: num
   <select 
     value={value} 
     onChange={(e) => onChange(Number(e.target.value))}
-    style={{
-      padding: '8px 12px',
-      border: '1px solid #d1d5db',
-      borderRadius: '6px',
-      fontSize: '14px',
-      backgroundColor: 'white'
-    }}
+    className="filter-select"
   >
     <option value={1}>January</option>
     <option value={2}>February</option>
@@ -75,18 +56,17 @@ const MonthSlicer = ({ value, onChange }: { value: number; onChange: (value: num
   </select>
 )
 
-// IMPROVED SUB HEADER - SAME LAYOUT AS MAIN DASHBOARD
-export default function SubHeader({ 
-  title, 
-  year, setYear, 
-  currency, setCurrency, 
-  month, setMonth, 
+export default function SubHeader({
+  title,
+  year, setYear,
+  currency, setCurrency,
+  month, setMonth,
   showMonthSlicer = true
 }: SubHeaderProps) {
   return (
-    <div className="dashboard-header-fixed">
-      <h2 className="dashboard-subtitle">{title}</h2>
-      <div className="slicer-controls">
+    <div className="subheader-container">
+      <h2 className="subheader-title">{title}</h2>
+      <div className="subheader-controls">
         <div className="filter-group">
           <label>Year:</label>
           <YearSlicer value={year} onChange={setYear} />
