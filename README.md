@@ -277,4 +277,4 @@ Jika ada pertanyaan atau masalah:
 
 ---
 
-**Dibuat dengan ❤️ menggunakan HTML, CSS, JavaScript, dan Supabase** 
+**Dibuat dengan ❤️ menggunakan HTML, CSS, JavaScript, dan Supabase**
