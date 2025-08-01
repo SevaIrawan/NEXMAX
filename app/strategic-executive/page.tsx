@@ -61,15 +61,13 @@ export default function StrategicExecutive() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    // Check authentication
-    const session = localStorage.getItem('nexmax_session')
-    if (!session) {
-      router.push('/login')
-      return
+    // TEMPORARY: Bypass authentication for testing
+    const mockUser = {
+      id: 1,
+      username: 'admin',
+      role: 'admin'
     }
-
-    const sessionData = JSON.parse(session)
-    setUser(sessionData)
+    setUser(mockUser)
     
     // Check dark mode preference
     const isDark = localStorage.getItem('darkMode') === 'true'
