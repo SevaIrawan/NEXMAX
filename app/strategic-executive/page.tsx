@@ -214,15 +214,7 @@ export default function StrategicExecutive() {
       onToggleDarkMode={handleToggleDarkMode}
       onLogout={handleLogout}
     >
-      <SubHeader 
-        title="Strategic Executive Dashboard"
-        year={year}
-        setYear={setYear}
-        currency={currency}
-        setCurrency={setCurrency}
-        month={month}
-        setMonth={setMonth}
-      />
+      <SubHeader title="Strategic Executive Dashboard" />
       
       {loading ? (
         <div style={{ textAlign: 'center', marginTop: '50px', color: '#64748b' }}>
