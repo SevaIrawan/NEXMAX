@@ -16,7 +16,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <div style={{ 
+          display: 'flex', 
+          minHeight: '100vh', 
+          backgroundColor: '#f8f9fa' 
+        }}>
+          {children}
+        </div>
+      </body>
     </html>
   )
 } 

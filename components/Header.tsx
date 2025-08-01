@@ -116,7 +116,7 @@ export default function Header({
         .header {
           position: fixed;
           top: 0;
-          left: ${sidebarExpanded ? '250px' : '0px'};
+          left: ${sidebarExpanded ? '250px' : '75px'};
           right: 0;
           height: 85px;
           background: linear-gradient(135deg, #1a1d29 0%, #2d3142 50%, #1a1d29 100%);

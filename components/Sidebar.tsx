@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Image from 'next/image'
+import { supabase } from '@/lib/supabase'
 
 interface SidebarProps {
   user?: any
@@ -12,6 +13,7 @@ interface SidebarProps {
 export default function Sidebar({ user, onExpandedChange }: SidebarProps) {
   const [isExpanded, setIsExpanded] = useState(true) // DEFAULT EXPANDABLE
   const [expandedSubmenu, setExpandedSubmenu] = useState<string | null>(null)
+  const [lastUpdateDate, setLastUpdateDate] = useState<string>('')
   const router = useRouter()
   const pathname = usePathname()
 
@@ -28,6 +30,45 @@ export default function Sidebar({ user, onExpandedChange }: SidebarProps) {
       onExpandedChange(isExpanded)
     }
   }, [isExpanded, onExpandedChange])
+
+  // Fetch MAX(DATE) dari table member_report_monthly
+  useEffect(() => {
+    const fetchLastUpdate = async () => {
+      try {
+        console.log('🔄 Fetching MAX(DATE) from member_report_monthly...')
+        
+        // Ambil MAX(DATE) dari kolom DATE
+        const { data, error } = await supabase
+          .from('member_report_monthly')
+          .select('date')
+          .order('date', { ascending: false })
+          .limit(1)
+
+        if (error) {
+          console.error('❌ Error fetching MAX(DATE):', error)
+          return
+        }
+
+        if (data && data.length > 0) {
+          const maxDate = data[0].date
+          if (maxDate) {
+            const date = new Date(maxDate)
+            const formattedDate = date.toLocaleDateString('en-US', {
+              month: 'short',
+              day: '2-digit',
+              year: 'numeric'
+            })
+            setLastUpdateDate(formattedDate)
+            console.log('✅ MAX(DATE) set to:', formattedDate)
+          }
+        }
+      } catch (error) {
+        console.error('❌ Error in fetchLastUpdate:', error)
+      }
+    }
+
+    fetchLastUpdate()
+  }, [])
 
   const formatLastUpdate = (timestamp: any) => {
     if (!timestamp) return `🔄 Data Updated: ${new Date().toLocaleDateString('en-US', { 
@@ -110,25 +151,25 @@ export default function Sidebar({ user, onExpandedChange }: SidebarProps) {
     },
     { 
       key: 'transaction',
-      icon: '💳', 
+      icon: '📈', 
       label: 'Transaction', 
       href: '#',
-      hasSubmenu: true,
       isActive: pathname.startsWith('/transaction'),
+      hasSubmenu: true,
       submenu: [
-        { label: 'Deposit Transaction', href: '/transaction/deposit' },
-        { label: 'Withdraw Transaction', href: '/transaction/withdraw' },
-        { label: 'Exchange', href: '/transaction/exchange' },
-        { label: 'Headcount', href: '/transaction/headcount' },
-        { label: 'New Register', href: '/transaction/new-register' },
-        { label: 'New Depositor', href: '/transaction/new-depositor' },
-        { label: 'Adjustment', href: '/transaction/adjustment' },
-        { label: 'VIP Program', href: '/transaction/vip-program' }
+        { icon: '💳', label: 'Deposit', href: '/transaction/deposit' },
+        { icon: '💸', label: 'Withdraw', href: '/transaction/withdraw' },
+        { icon: '🔄', label: 'Adjustment', href: '/transaction/adjustment' },
+        { icon: '💱', label: 'Exchange', href: '/transaction/exchange' },
+        { icon: '👥', label: 'Headcount', href: '/transaction/headcount' },
+        { icon: '👤', label: 'New Depositor', href: '/transaction/new-depositor' },
+        { icon: '📝', label: 'New Register', href: '/transaction/new-register' },
+        { icon: '👑', label: 'VIP Program', href: '/transaction/vip-program' }
       ]
     },
     { 
       key: 'users',
-      icon: '👤', 
+      icon: '👥', 
       label: 'User Management', 
       href: '/users',
       isActive: pathname === '/users'
@@ -138,80 +179,69 @@ export default function Sidebar({ user, onExpandedChange }: SidebarProps) {
   return (
     <>
       <aside className={`sidebar ${isExpanded ? 'expanded' : 'collapsed'}`}>
-        {/* Company Logo + Professional Toggle */}
+        {/* Professional Header Section */}
         <div className="header-section">
           <div className="logo-container">
             <div className="company-logo">
-              <Image src="/aset/images (1).jpg" alt="NEXMAX" className="logo-image" width={40} height={40} />
+              <Image
+                src="/aset/images (1).jpg"
+                alt="NEXMAX Logo"
+                width={45}
+                height={45}
+                className="logo-image"
+              />
             </div>
             {isExpanded && (
-              <div className="company-text">
-                <h3>NEXMAX</h3>
-                <span>Dashboard</span>
+              <div className="company-info">
+                <div className="company-name">NEXMAX</div>
+                <div className="company-subtitle">Dashboard</div>
               </div>
             )}
           </div>
           
-          {/* Professional Toggle Button */}
           <button 
-            className="professional-toggle"
+            className="collapse-btn"
             onClick={() => setIsExpanded(!isExpanded)}
-            title={isExpanded ? 'Minimize Sidebar' : 'Expand Sidebar'}
+            title={isExpanded ? 'Collapse Sidebar' : 'Expand Sidebar'}
           >
-            {isExpanded ? (
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
-              </svg>
-            ) : (
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
-              </svg>
-            )}
+            <span className="collapse-icon">
+              {isExpanded ? '◀' : '▶'}
+            </span>
           </button>
         </div>
 
         {/* Navigation Menu */}
         <nav className="nav-menu">
           <ul>
-            {menuItems.map(item => (
+            {menuItems.map((item) => (
               <li key={item.key} className={item.isActive ? 'active' : ''}>
                 {item.hasSubmenu ? (
-                  <>
+                  <div>
                     <button 
                       className="menu-button"
                       onClick={() => toggleSubmenu(item.key)}
-                      data-tooltip={item.label}
                     >
                       <span className="icon">{item.icon}</span>
                       {isExpanded && (
                         <>
                           <span className="label">{item.label}</span>
-                          <span className="arrow">
-                            {expandedSubmenu === item.key ? (
-                              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-                                <path d="M7.41 8.84L12 13.42l4.59-4.58L18 10.25l-6 6-6-6z"/>
-                              </svg>
-                            ) : (
-                              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-                                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
-                              </svg>
-                            )}
+                          <span className={`arrow ${expandedSubmenu === item.key ? 'rotated' : ''}`}>
+                            ▶
                           </span>
                         </>
                       )}
                     </button>
                     
-                    {/* Submenu - PERSISTENT dengan SCROLL */}
-                    {isExpanded && expandedSubmenu === item.key && (
+                    {expandedSubmenu === item.key && isExpanded && (
                       <div className="submenu-container">
                         <ul className="submenu">
-                          {item.submenu.map(subItem => (
-                            <li key={subItem.href}>
+                          {item.submenu?.map((subItem, index) => (
+                            <li key={index}>
                               <a 
                                 href={subItem.href}
                                 className={pathname === subItem.href ? 'active' : ''}
                               >
-                                <span className="sub-icon">•</span>
+                                <span className="sub-icon">{subItem.icon}</span>
                                 <span className="sub-label">{subItem.label}</span>
                               </a>
                             </li>
@@ -219,9 +249,13 @@ export default function Sidebar({ user, onExpandedChange }: SidebarProps) {
                         </ul>
                       </div>
                     )}
-                  </>
+                  </div>
                 ) : (
-                  <a href={item.href} className="menu-link" data-tooltip={item.label}>
+                  <a 
+                    href={item.href}
+                    className="menu-link"
+                    data-tooltip={!isExpanded ? item.label : undefined}
+                  >
                     <span className="icon">{item.icon}</span>
                     {isExpanded && <span className="label">{item.label}</span>}
                   </a>
@@ -237,11 +271,7 @@ export default function Sidebar({ user, onExpandedChange }: SidebarProps) {
             {isExpanded && (
               <div className="update-content">
                 <span className="update-text-single">
-                  {`LAST UPDATE: ${new Date().toLocaleDateString('en-US', { 
-                    month: 'short', 
-                    day: '2-digit', 
-                    year: 'numeric' 
-                  })}`}
+                  {lastUpdateDate ? `UPDATE: ${lastUpdateDate}` : '🔄 Loading...'}
                 </span>
               </div>
             )}
@@ -252,7 +282,7 @@ export default function Sidebar({ user, onExpandedChange }: SidebarProps) {
       {/* Add global style to adjust main content based on sidebar state */}
       <style jsx global>{`
         .main-content {
-          margin-left: ${isExpanded ? '280px' : '75px'} !important;
+          margin-left: ${isExpanded ? '250px' : '75px'} !important;
           transition: margin-left 0.3s ease;
         }
       `}</style>
@@ -280,7 +310,7 @@ export default function Sidebar({ user, onExpandedChange }: SidebarProps) {
         }
 
         .sidebar.collapsed {
-          width: 75px;
+          width: 90px;
         }
 
         .sidebar.expanded {
@@ -319,73 +349,74 @@ export default function Sidebar({ user, onExpandedChange }: SidebarProps) {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: transparent;
+          background: linear-gradient(135deg, #fbbf24, #f59e0b);
           border: 2px solid #fbbf24;
           box-shadow: 0 0 8px rgba(251, 191, 36, 0.3);
+        }
+
+        .logo-text {
+          color: #1f2937;
+          font-size: 18px;
+          font-weight: 700;
+          letter-spacing: 1px;
         }
 
         .logo-image {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          border-radius: 50%;
         }
 
-        .company-text {
-          opacity: 1;
-          transform: translateX(0);
-          transition: all 0.3s ease;
+        .company-info {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
         }
 
-        .company-text h3 {
-          margin: 0;
-          color: white;
-          font-size: 1.2rem;
+        .company-name {
+          color: #ffffff;
+          font-size: 1.1rem;
           font-weight: 700;
+          letter-spacing: 0.5px;
         }
 
-        .company-text span {
+        .company-subtitle {
           color: #94a3b8;
-          font-size: 0.9rem;
+          font-size: 0.8rem;
+          font-weight: 500;
         }
 
-        /* Professional Toggle Button */
-        .professional-toggle {
-          width: 36px;
-          height: 36px;
-          border-radius: 10px;
+        .collapse-btn {
           background: rgba(255,255,255,0.1);
-          border: 1px solid rgba(255,255,255,0.15);
-          color: #cbd5e1;
-          cursor: pointer;
+          border: none;
+          border-radius: 50%;
+          width: 32px;
+          height: 32px;
           display: flex;
           align-items: center;
           justify-content: center;
+          cursor: pointer;
           transition: all 0.2s ease;
-          backdrop-filter: blur(10px);
+          color: #94a3b8;
         }
 
-        .professional-toggle:hover {
-          background: rgba(255,255,255,0.15);
-          border-color: rgba(255,255,255,0.25);
+        .collapse-btn:hover {
+          background: rgba(255,255,255,0.2);
           color: white;
-          transform: scale(1.05);
         }
 
-        .professional-toggle:active {
-          transform: scale(0.95);
-        }
-
-        .professional-toggle svg {
+        .collapse-icon {
+          font-size: 0.8rem;
           transition: transform 0.2s ease;
         }
 
         /* Navigation Menu */
         .nav-menu {
           flex: 1;
-          padding: 20px 0;
           overflow-y: auto;
           overflow-x: hidden;
+          padding: 20px 0;
+          margin: 0;
         }
 
         .nav-menu ul {
@@ -394,8 +425,8 @@ export default function Sidebar({ user, onExpandedChange }: SidebarProps) {
           padding: 0;
         }
 
-        .nav-menu > ul > li {
-          margin-bottom: 8px;
+        .nav-menu li {
+          margin-bottom: 4px;
         }
 
         .menu-link, .menu-button {
@@ -444,6 +475,10 @@ export default function Sidebar({ user, onExpandedChange }: SidebarProps) {
           align-items: center;
           justify-content: center;
           transition: transform 0.2s ease;
+        }
+
+        .arrow.rotated {
+          transform: rotate(90deg);
         }
 
         /* Submenu Container dengan SCROLL */
@@ -498,42 +533,30 @@ export default function Sidebar({ user, onExpandedChange }: SidebarProps) {
           width: 20px;
           text-align: center;
           color: #667eea;
-          font-size: 0.8rem;
           margin-right: 8px;
+          font-size: 0.9rem;
         }
 
         .sub-label {
-          font-size: 0.85rem;
-          font-weight: 400;
           flex: 1;
         }
 
-        /* Logout Section */
-        .logout-section {
-          padding: 20px 0;
-          border-top: 1px solid rgba(255,255,255,0.1);
-          flex-shrink: 0;
-        }
-
+        /* 
+        date Section */
         .last-update-section {
+          padding: 16px 10px;
+          border-top: 1px solid rgba(255,255,255,0.1);
+          background: rgba(0,0,0,0.2);
           margin-top: auto;
-          padding: 16px 0;
-          border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .last-update-item {
-          display: flex;
-          align-items: center;
-          padding: 14px 18px;
-          color: #fbbf24;
-          font-size: 0.9rem;
-          background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.15));
-          border-radius: 10px;
-          margin: 0 12px;
-          border: 1px solid rgba(251, 191, 36, 0.4);
-          box-shadow: 0 2px 8px rgba(251, 191, 36, 0.2);
           position: relative;
           overflow: hidden;
+          border-radius: 5px;
+          background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+          border: 2px solid #f59e0b;
+          padding: 12px 16px;
         }
 
         .last-update-item::before {
@@ -561,9 +584,9 @@ export default function Sidebar({ user, onExpandedChange }: SidebarProps) {
 
         .update-text-single {
           color: #ffffff;
-          font-size: 0.85rem;
-          font-weight: 600;
-          line-height: 1.3;
+          font-size: 1rem;
+          font-weight: 500;
+          line-height: 1.4;
           text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
           background: linear-gradient(90deg, #fbbf24, #f59e0b);
           -webkit-background-clip: text;
@@ -572,7 +595,7 @@ export default function Sidebar({ user, onExpandedChange }: SidebarProps) {
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-          letter-spacing: 0.2px;
+          letter-spacing: 0.3px;
           width: 100%;
           text-align: center;
         }
