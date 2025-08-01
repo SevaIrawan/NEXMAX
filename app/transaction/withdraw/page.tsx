@@ -70,15 +70,7 @@ export default function WithdrawPage() {
       onToggleDarkMode={handleToggleDarkMode}
       onLogout={handleLogout}
     >
-      <SubHeader 
-        title="Withdraw Transaction"
-        year={year}
-        setYear={setYear}
-        currency={currency}
-        setCurrency={setCurrency}
-        month={month}
-        setMonth={setMonth}
-      />
+      <SubHeader title="Withdraw Transaction" />
       
       <div className="text-center" style={{ marginTop: '50px' }}>
         <h1 className="text-4xl font-bold text-gray-900 mb-4">

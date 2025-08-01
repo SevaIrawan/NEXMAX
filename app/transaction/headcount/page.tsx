@@ -70,15 +70,7 @@ export default function HeadcountPage() {
       onToggleDarkMode={handleToggleDarkMode}
       onLogout={handleLogout}
     >
-      <SubHeader 
-        title="Headcount Transaction"
-        year={year}
-        setYear={setYear}
-        currency={currency}
-        setCurrency={setCurrency}
-        month={month}
-        setMonth={setMonth}
-      />
+      <SubHeader title="Headcount Transaction" />
       
       <div className="text-center" style={{ marginTop: '50px' }}>
         <h1 className="text-4xl font-bold text-gray-900 mb-4">

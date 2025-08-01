@@ -70,15 +70,7 @@ export default function VipProgramPage() {
       onToggleDarkMode={handleToggleDarkMode}
       onLogout={handleLogout}
     >
-      <SubHeader 
-        title="VIP Program Transaction"
-        year={year}
-        setYear={setYear}
-        currency={currency}
-        setCurrency={setCurrency}
-        month={month}
-        setMonth={setMonth}
-      />
+      <SubHeader title="VIP Program Transaction" />
       
       <div className="text-center" style={{ marginTop: '50px' }}>
         <h1 className="text-4xl font-bold text-gray-900 mb-4">
