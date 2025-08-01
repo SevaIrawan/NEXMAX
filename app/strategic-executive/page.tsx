@@ -213,12 +213,8 @@ export default function StrategicExecutive() {
 
   return (
     <Layout
-      user={user}
-      darkMode={darkMode}
-      sidebarExpanded={sidebarExpanded}
-      setSidebarExpanded={setSidebarExpanded}
-      onToggleDarkMode={handleToggleDarkMode}
-      onLogout={handleLogout}
+      pageTitle="Strategic Executive"
+      subHeaderTitle="Strategic Executive Dashboard"
     >
       <SubHeader title="Strategic Executive Dashboard" />
       

@@ -63,12 +63,8 @@ export default function DepositPage() {
 
   return (
     <Layout
-      user={user}
-      darkMode={darkMode}
-      sidebarExpanded={sidebarExpanded}
-      setSidebarExpanded={setSidebarExpanded}
-      onToggleDarkMode={handleToggleDarkMode}
-      onLogout={handleLogout}
+      pageTitle="Deposit"
+      subHeaderTitle="Deposit Management"
     >
       <SubHeader title="Deposit Transaction" />
       

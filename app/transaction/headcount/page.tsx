@@ -63,12 +63,8 @@ export default function HeadcountPage() {
 
   return (
     <Layout
-      user={user}
-      darkMode={darkMode}
-      sidebarExpanded={sidebarExpanded}
-      setSidebarExpanded={setSidebarExpanded}
-      onToggleDarkMode={handleToggleDarkMode}
-      onLogout={handleLogout}
+      pageTitle="Headcount"
+      subHeaderTitle="Headcount Management"
     >
       <SubHeader title="Headcount Transaction" />
       

@@ -234,12 +234,8 @@ export default function UsersPage() {
 
   return (
     <Layout
-      user={user}
-      darkMode={darkMode}
-      sidebarExpanded={sidebarExpanded}
-      setSidebarExpanded={setSidebarExpanded}
-      onToggleDarkMode={handleToggleDarkMode}
-      onLogout={handleLogout}
+      pageTitle="Users"
+      subHeaderTitle="User Management"
     >
       <SubHeader title="User Management" />
       

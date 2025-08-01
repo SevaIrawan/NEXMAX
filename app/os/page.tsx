@@ -19,12 +19,8 @@ export default function OsPage() {
 
   return (
     <Layout
-      user={user}
-      darkMode={darkMode}
-      sidebarExpanded={sidebarExpanded}
-      setSidebarExpanded={setSidebarExpanded}
-      onToggleDarkMode={handleToggleDarkMode}
-      onLogout={handleLogout}
+      pageTitle="OS"
+      subHeaderTitle=""
     >
       {/* SUB HEADER - EMPTY FOR NOW */}
       <SubHeader title="OS" />

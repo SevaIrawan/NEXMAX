@@ -94,7 +94,6 @@ export const getLastUpdateDate = async () => {
       .select('date')
       .order('date', { ascending: false })
       .limit(1)
-      .timeout(10000)
     
     if (error) {
       console.error('❌ Failed to fetch last update date:', error)

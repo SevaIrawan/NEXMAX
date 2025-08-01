@@ -63,12 +63,8 @@ export default function ExchangePage() {
 
   return (
     <Layout
-      user={user}
-      darkMode={darkMode}
-      sidebarExpanded={sidebarExpanded}
-      setSidebarExpanded={setSidebarExpanded}
-      onToggleDarkMode={handleToggleDarkMode}
-      onLogout={handleLogout}
+      pageTitle="Exchange"
+      subHeaderTitle="Exchange Management"
     >
       <SubHeader title="Exchange Transaction" />
       

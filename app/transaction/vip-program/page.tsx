@@ -63,12 +63,8 @@ export default function VipProgramPage() {
 
   return (
     <Layout
-      user={user}
-      darkMode={darkMode}
-      sidebarExpanded={sidebarExpanded}
-      setSidebarExpanded={setSidebarExpanded}
-      onToggleDarkMode={handleToggleDarkMode}
-      onLogout={handleLogout}
+      pageTitle="VIP Program"
+      subHeaderTitle="VIP Program Management"
     >
       <SubHeader title="VIP Program Transaction" />
       

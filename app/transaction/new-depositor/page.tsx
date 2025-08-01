@@ -63,12 +63,8 @@ export default function NewDepositorPage() {
 
   return (
     <Layout
-      user={user}
-      darkMode={darkMode}
-      sidebarExpanded={sidebarExpanded}
-      setSidebarExpanded={setSidebarExpanded}
-      onToggleDarkMode={handleToggleDarkMode}
-      onLogout={handleLogout}
+      pageTitle="New Depositor"
+      subHeaderTitle="New Depositor Management"
     >
       <SubHeader title="New Depositor Transaction" />
       

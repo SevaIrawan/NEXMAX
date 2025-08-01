@@ -63,12 +63,8 @@ export default function NewRegisterPage() {
 
   return (
     <Layout
-      user={user}
-      darkMode={darkMode}
-      sidebarExpanded={sidebarExpanded}
-      setSidebarExpanded={setSidebarExpanded}
-      onToggleDarkMode={handleToggleDarkMode}
-      onLogout={handleLogout}
+      pageTitle="New Register"
+      subHeaderTitle="New Register Management"
     >
       <SubHeader title="New Register Transaction" />
       

@@ -63,12 +63,8 @@ export default function WithdrawPage() {
 
   return (
     <Layout
-      user={user}
-      darkMode={darkMode}
-      sidebarExpanded={sidebarExpanded}
-      setSidebarExpanded={setSidebarExpanded}
-      onToggleDarkMode={handleToggleDarkMode}
-      onLogout={handleLogout}
+      pageTitle="Withdraw"
+      subHeaderTitle="Withdraw Management"
     >
       <SubHeader title="Withdraw Transaction" />
       

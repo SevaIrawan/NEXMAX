@@ -63,12 +63,8 @@ export default function AdjustmentPage() {
 
   return (
     <Layout
-      user={user}
-      darkMode={darkMode}
-      sidebarExpanded={sidebarExpanded}
-      setSidebarExpanded={setSidebarExpanded}
-      onToggleDarkMode={handleToggleDarkMode}
-      onLogout={handleLogout}
+      pageTitle="Adjustment"
+      subHeaderTitle="Adjustment Management"
     >
       <SubHeader title="Adjustment Transaction" />
       

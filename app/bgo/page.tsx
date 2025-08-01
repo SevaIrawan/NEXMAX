@@ -5,10 +5,9 @@ import Layout from '@/components/Layout'
 import SubHeader from '@/components/SubHeader'
 
 export default function BgoPage() {
-  const [sidebarExpanded, setSidebarExpanded] = useState(true)
   const [darkMode, setDarkMode] = useState(false)
+  const [sidebarExpanded, setSidebarExpanded] = useState(true)
 
-  // Mock user data - akan diganti dengan Supabase auth
   const user = {
     email: 'admin@nexmax.com',
     role: 'admin'
@@ -19,12 +18,8 @@ export default function BgoPage() {
 
   return (
     <Layout
-      user={user}
-      darkMode={darkMode}
-      sidebarExpanded={sidebarExpanded}
-      setSidebarExpanded={setSidebarExpanded}
-      onToggleDarkMode={handleToggleDarkMode}
-      onLogout={handleLogout}
+      pageTitle="BGO"
+      subHeaderTitle=""
     >
       {/* SUB HEADER - EMPTY FOR NOW */}
       <SubHeader title="" />

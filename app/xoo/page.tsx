@@ -19,12 +19,8 @@ export default function XooPage() {
 
   return (
     <Layout
-      user={user}
-      darkMode={darkMode}
-      sidebarExpanded={sidebarExpanded}
-      setSidebarExpanded={setSidebarExpanded}
-      onToggleDarkMode={handleToggleDarkMode}
-      onLogout={handleLogout}
+      pageTitle="XOO"
+      subHeaderTitle=""
     >
       {/* SUB HEADER - EMPTY FOR NOW */}
       <SubHeader title="XOO" />
