@@ -66,7 +66,7 @@ export default function ExchangePage() {
       pageTitle="Exchange"
       subHeaderTitle="Exchange Management"
     >
-      <SubHeader title="Exchange Transaction" />
+      <SubHeader title="" />
       
       <div className="text-center" style={{ marginTop: '50px' }}>
         <h1 className="text-4xl font-bold text-gray-900 mb-4">

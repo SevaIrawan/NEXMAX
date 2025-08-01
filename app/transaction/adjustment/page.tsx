@@ -66,7 +66,7 @@ export default function AdjustmentPage() {
       pageTitle="Adjustment"
       subHeaderTitle="Adjustment Management"
     >
-      <SubHeader title="Adjustment Transaction" />
+      <SubHeader title="" />
       
       <div className="text-center" style={{ marginTop: '50px' }}>
         <h1 className="text-4xl font-bold text-gray-900 mb-4">

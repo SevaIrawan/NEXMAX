@@ -293,7 +293,7 @@ export default function BusinessFlow() {
       onLogout={handleLogout}
     >
       {/* SUB HEADER - EMPTY FOR NOW */}
-      <SubHeader title="Business Flow" />
+      <SubHeader title="" />
       
       {/* CONTENT - BUSINESS FLOW MODULES */}
       <div style={{

@@ -66,7 +66,7 @@ export default function VipProgramPage() {
       pageTitle="VIP Program"
       subHeaderTitle="VIP Program Management"
     >
-      <SubHeader title="VIP Program Transaction" />
+      <SubHeader title="" />
       
       <div className="text-center" style={{ marginTop: '50px' }}>
         <h1 className="text-4xl font-bold text-gray-900 mb-4">

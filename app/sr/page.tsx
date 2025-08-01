@@ -1,132 +1,86 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Layout from '@/components/Layout'
 import SubHeader from '@/components/SubHeader'
 
-export default function SrPage() {
-  const [sidebarExpanded, setSidebarExpanded] = useState(true)
+export default function SRPage() {
+  const [user, setUser] = useState<any>(null)
   const [darkMode, setDarkMode] = useState(false)
+  const [sidebarExpanded, setSidebarExpanded] = useState(true)
+  const router = useRouter()
 
-  // Mock user data - akan diganti dengan Supabase auth
-  const user = {
-    email: 'admin@nexmax.com',
-    role: 'admin'
+  const [year, setYear] = useState(2025)
+  const [currency, setCurrency] = useState('USD')
+  const [month, setMonth] = useState(1)
+
+  useEffect(() => {
+    // Check authentication
+    const session = localStorage.getItem('nexmax_session')
+    if (!session) {
+      router.push('/login')
+      return
+    }
+
+    const sessionData = JSON.parse(session)
+    setUser(sessionData)
+    
+    // Check dark mode preference
+    const isDark = localStorage.getItem('darkMode') === 'true'
+    setDarkMode(isDark)
+    if (isDark) {
+      document.documentElement.classList.add('dark')
+    }
+  }, [router])
+
+  const handleLogout = () => {
+    try {
+      localStorage.removeItem('nexmax_session')
+      document.cookie = 'user_id=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT'
+      document.cookie = 'username=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT'
+      document.cookie = 'user_role=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT'
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
+    router.push('/login')
   }
 
-  const handleToggleDarkMode = () => setDarkMode(!darkMode)
-  const handleLogout = () => console.log('Logout clicked')
+  const handleToggleDarkMode = () => {
+    const newDarkMode = !darkMode
+    setDarkMode(newDarkMode)
+    localStorage.setItem('darkMode', newDarkMode.toString())
+    if (newDarkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }
+
+  if (!user) {
+    return null
+  }
 
   return (
     <Layout
       pageTitle="SR"
-      subHeaderTitle=""
+      subHeaderTitle="SR"
     >
-      {/* SUB HEADER - EMPTY FOR NOW */}
-      <SubHeader title="S&R" />
-
-      {/* CONTENT - PROPERLY POSITIONED */}
-      <div style={{ 
-        padding: '40px',
-        minHeight: 'calc(100vh - 185px)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <div className="coming-soon-card">
-          <div className="icon-large">📋</div>
-          <h1>S&R</h1>
-          <p>Sales & Revenue dashboard is currently under development.</p>
-          <div className="features-list">
-            <div className="feature-item">💰 Sales Analytics</div>
-            <div className="feature-item">📈 Revenue Tracking</div>
-            <div className="feature-item">🎯 Sales Targets</div>
-            <div className="feature-item">📊 Performance Reports</div>
-          </div>
-          <div className="status-badge">Coming Soon</div>
+      <SubHeader title="" />
+      
+      <div className="text-center" style={{ marginTop: '50px' }}>
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          🚧 Coming Soon
+        </h1>
+        <p className="text-xl text-gray-600 mb-8">
+          SR Department sedang dalam pengembangan
+        </p>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-md mx-auto">
+          <p className="text-blue-800">
+            Fitur ini akan segera hadir.
+          </p>
         </div>
       </div>
-
-      <style jsx>{`
-        .coming-soon-card {
-          background: white;
-          border-radius: 16px;
-          padding: 60px;
-          text-align: center;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-          max-width: 600px;
-          width: 100%;
-        }
-        
-        .icon-large {
-          font-size: 5rem;
-          margin-bottom: 32px;
-          opacity: 0.8;
-        }
-        
-        .coming-soon-card h1 {
-          font-size: 2.5rem;
-          margin: 0 0 20px 0;
-          color: #1f2937;
-          font-weight: 700;
-        }
-        
-        .coming-soon-card p {
-          font-size: 1.2rem;
-          color: #6b7280;
-          margin: 0 0 40px 0;
-          line-height: 1.6;
-        }
-        
-        .features-list {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 16px;
-          margin-bottom: 40px;
-        }
-        
-        .feature-item {
-          padding: 16px;
-          background: #f8f9fa;
-          border-radius: 12px;
-          font-weight: 500;
-          color: #374151;
-          border: 1px solid #e5e7eb;
-          transition: all 0.3s ease;
-        }
-        
-        .feature-item:hover {
-          background: #e0f2fe;
-          border-color: #0ea5e9;
-          transform: translateY(-2px);
-        }
-        
-        .status-badge {
-          display: inline-block;
-          background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-          color: white;
-          padding: 12px 32px;
-          border-radius: 25px;
-          font-weight: 600;
-          font-size: 1rem;
-          box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-        }
-        
-        @media (max-width: 768px) {
-          .coming-soon-card {
-            padding: 40px 20px;
-            margin: 20px;
-          }
-          
-          .features-list {
-            grid-template-columns: 1fr;
-          }
-          
-          .coming-soon-card h1 {
-            font-size: 2rem;
-          }
-        }
-      `}</style>
     </Layout>
   )
 } 

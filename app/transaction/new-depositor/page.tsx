@@ -66,7 +66,7 @@ export default function NewDepositorPage() {
       pageTitle="New Depositor"
       subHeaderTitle="New Depositor Management"
     >
-      <SubHeader title="New Depositor Transaction" />
+      <SubHeader title="" />
       
       <div className="text-center" style={{ marginTop: '50px' }}>
         <h1 className="text-4xl font-bold text-gray-900 mb-4">

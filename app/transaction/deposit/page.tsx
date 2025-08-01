@@ -66,7 +66,7 @@ export default function DepositPage() {
       pageTitle="Deposit"
       subHeaderTitle="Deposit Management"
     >
-      <SubHeader title="Deposit Transaction" />
+      <SubHeader title="" />
       
       <div className="text-center" style={{ marginTop: '50px' }}>
         <h1 className="text-4xl font-bold text-gray-900 mb-4">

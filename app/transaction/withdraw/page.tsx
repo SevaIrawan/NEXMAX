@@ -66,7 +66,7 @@ export default function WithdrawPage() {
       pageTitle="Withdraw"
       subHeaderTitle="Withdraw Management"
     >
-      <SubHeader title="Withdraw Transaction" />
+      <SubHeader title="" />
       
       <div className="text-center" style={{ marginTop: '50px' }}>
         <h1 className="text-4xl font-bold text-gray-900 mb-4">
