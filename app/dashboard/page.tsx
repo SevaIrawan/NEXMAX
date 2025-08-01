@@ -180,15 +180,7 @@ export default function Dashboard() {
       onToggleDarkMode={handleToggleDarkMode}
       onLogout={handleLogout}
     >
-      <SubHeader 
-        title="Performance Overview"
-        year={year}
-        setYear={setYear}
-        currency={currency}
-        setCurrency={setCurrency}
-        month={month}
-        setMonth={setMonth}
-      />
+      <SubHeader title="Performance Overview" />
       
       {loading ? (
         <div style={{ textAlign: 'center', marginTop: '50px', color: '#64748b' }}>
