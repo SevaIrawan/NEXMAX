@@ -241,16 +241,7 @@ export default function UsersPage() {
       onToggleDarkMode={handleToggleDarkMode}
       onLogout={handleLogout}
     >
-      <SubHeader 
-        title="User Management"
-        year={2025}
-        setYear={() => {}}
-        currency="USD"
-        setCurrency={() => {}}
-        month={1}
-        setMonth={() => {}}
-        showMonthSlicer={false}
-      />
+      <SubHeader title="User Management" />
       
       <div className="table-container">
         <div className="table-header">
