@@ -1,11 +1,11 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Supabase Configuration - Using hardcoded values for now
-const supabaseUrl = 'https://bbuxfnchflhtulainndm.supabase.co'
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJidXhmbmNoZmxodHVsYWlubmRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4NDYzMjYsImV4cCI6MjA2OTQyMjMyNn0.AF6IiaeGB9-8FYZNKQsbnl5yZmSjBMj7Ag4eUunEbtc'
+// Direct Supabase configuration - bypassing .env.local issues
+const SUPABASE_URL = 'https://bbuxfnchflhtulainndm.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJidXhmbmNoZmxodHVsYWlubmRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4NDYzMjYsImV4cCI6MjA2OTQyMjMyNn0.AF6IiaeGB9-8FYZNKQsbnl5yZmSjBMj7Ag4eUunEbtc'
 
-// Create Supabase client with better error handling
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+// Create Supabase client
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
@@ -22,9 +22,10 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 export const testSupabaseConnection = async () => {
   try {
     console.log('🔗 Testing Supabase connection...')
-    console.log('📡 URL:', supabaseUrl)
-    console.log('🔑 Key exists:', !!supabaseAnonKey)
+    console.log('📡 URL:', SUPABASE_URL)
+    console.log('🔑 Key exists:', !!SUPABASE_ANON_KEY)
     
+    // Test basic connection
     const { data, error } = await supabase
       .from('member_report_monthly')
       .select('count')
@@ -37,9 +38,41 @@ export const testSupabaseConnection = async () => {
     
     console.log('✅ Supabase connection successful')
     return true
+    
   } catch (error) {
     console.error('❌ Supabase connection error:', error)
     return false
+  }
+}
+
+// Get last update date function
+export const getLastUpdateDate = async () => {
+  try {
+    console.log('📅 Fetching last update date...')
+    
+    const { data, error } = await supabase
+      .from('member_report_monthly')
+      .select('date')
+      .order('date', { ascending: false })
+      .limit(1)
+    
+    if (error) {
+      console.error('❌ Failed to fetch last update date:', error)
+      return null
+    }
+    
+    if (data && data.length > 0) {
+      const lastDate = data[0].date
+      console.log('✅ Last update date found:', lastDate)
+      return lastDate
+    }
+    
+    console.log('⚠️ No data found in member_report_monthly table')
+    return null
+    
+  } catch (error) {
+    console.error('❌ Error fetching last update date:', error)
+    return null
   }
 }
 
