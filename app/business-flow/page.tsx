@@ -257,6 +257,7 @@ export default function BusinessFlow() {
     ],
   };
 
+  // Chart options
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -284,10 +285,10 @@ export default function BusinessFlow() {
 
   return (
     <Layout
-      user={user}
+      pageTitle="Business Flow"
+      subHeaderTitle="Business Flow"
       darkMode={darkMode}
       sidebarExpanded={sidebarExpanded}
-      setSidebarExpanded={setSidebarExpanded}
       onToggleDarkMode={() => setDarkMode(!darkMode)}
       onLogout={handleLogout}
     >

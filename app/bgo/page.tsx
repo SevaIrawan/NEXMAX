@@ -27,7 +27,7 @@ export default function BgoPage() {
       onLogout={handleLogout}
     >
       {/* SUB HEADER - EMPTY FOR NOW */}
-      <SubHeader title="BGO" />
+      <SubHeader title="" />
 
       {/* CONTENT - PROPERLY POSITIONED */}
       <div style={{ 

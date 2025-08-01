@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Image from 'next/image'
-import { supabase, testSupabaseConnection, getLastUpdateDate } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 
 interface SidebarProps {
   sidebarOpen: boolean
@@ -28,45 +28,57 @@ export default function Sidebar({
   const [isConnected, setIsConnected] = useState<boolean>(false)
 
   useEffect(() => {
-    const fetchLastUpdate = async () => {
-      try {
-        console.log('🔄 Sidebar - Starting LAST UPDATE fetch...')
-        
-        // Test connection first
-        const connectionTest = await testSupabaseConnection()
-        setIsConnected(connectionTest)
-        
-        if (!connectionTest) {
-          console.error('❌ Sidebar - Supabase connection failed, cannot fetch LAST UPDATE')
-          setLastUpdate('Connection Failed')
-          return
-        }
-        
-        // Get last update date
-        const lastDate = await getLastUpdateDate()
-        
-        if (lastDate) {
-          // Format the date to show as "Jul 28" format
-          const date = new Date(lastDate)
-          const formattedDate = date.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric'
-          })
-          setLastUpdate(formattedDate)
-          console.log('✅ Sidebar - LAST UPDATE set to:', formattedDate)
-        } else {
-          setLastUpdate('No Data')
-          console.log('⚠️ Sidebar - No last update date found')
-        }
-        
-      } catch (error) {
-        console.error('❌ Sidebar - Error fetching last update:', error)
-        setLastUpdate('Error')
-      }
-    }
-
     fetchLastUpdate()
+    // Auto refresh setiap 60 detik
+    const interval = setInterval(fetchLastUpdate, 60000)
+    return () => clearInterval(interval)
   }, [])
+
+  const fetchLastUpdate = async () => {
+    try {
+      console.log('�� Sidebar - Fetching MAX(date) from master table member_report_monthly...')
+      
+      // Mengambil MAX(date) dari kolom master member_report_monthly
+      const { data, error } = await supabase
+        .from('member_report_monthly')
+        .select('date')
+        .order('date', { ascending: false })
+        .limit(1)
+      
+      if (error) {
+        console.error('❌ Sidebar - Error fetching MAX(date):', error)
+        setIsConnected(false)
+        return
+      }
+
+      if (data && data.length > 0) {
+        const maxDate = data[0].date
+        console.log('📅 Raw MAX(date) from master table:', maxDate)
+        
+        const dateParts = maxDate.split('/')
+        const month = parseInt(dateParts[0])
+        const day = parseInt(dateParts[1])
+        const year = parseInt(dateParts[2])
+        
+        const date = new Date(year, month - 1, day)
+        const formattedDate = date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric'
+        })
+        
+        setLastUpdate(formattedDate)
+        setIsConnected(true)
+        console.log('✅ Sidebar - MAX(date) updated from master table:', formattedDate)
+        console.log('📊 Master table member_report_monthly is the reference for LAST UPDATE')
+      } else {
+        console.log('⚠️ Sidebar - No data found in master table')
+        setIsConnected(false)
+      }
+    } catch (error) {
+      console.error('❌ Sidebar - Exception fetching MAX(date):', error)
+      setIsConnected(false)
+    }
+  }
 
   const menuItems = [
     {
@@ -117,6 +129,11 @@ export default function Sidebar({
         { title: 'New Register', path: '/transaction/new-register' },
         { title: 'VIP Program', path: '/transaction/vip-program' }
       ]
+    },
+    {
+      title: 'Supabase',
+      path: '/connection-test',
+      icon: '🔌'
     },
     {
       title: 'Users',
