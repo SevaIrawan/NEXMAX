@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Image from 'next/image'
-import { supabase } from '@/lib/supabase'
+import { supabase, testSupabaseConnection } from '@/lib/supabase'
 
 interface SidebarProps {
   user?: any
@@ -36,17 +36,11 @@ export default function Sidebar({ user, onExpandedChange }: SidebarProps) {
     const fetchLastUpdate = async () => {
       try {
         console.log('🔄 Fetching MAX(DATE) from member_report_monthly...')
-        console.log('🔗 Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
-        console.log('🔑 Supabase Key exists:', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
         
         // Test connection first
-        const { data: testData, error: testError } = await supabase
-          .from('member_report_monthly')
-          .select('count')
-          .limit(1)
-
-        if (testError) {
-          console.error('❌ Supabase connection test failed:', testError)
+        const isConnected = await testSupabaseConnection()
+        if (!isConnected) {
+          console.error('❌ Supabase connection failed, cannot fetch data')
           return
         }
         

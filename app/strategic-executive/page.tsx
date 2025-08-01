@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Layout from '@/components/Layout'
 import SubHeader from '@/components/SubHeader'
-import { supabase } from '@/lib/supabase'
+import { supabase, testSupabaseConnection } from '@/lib/supabase'
 
 export default function StrategicExecutive() {
   const [user, setUser] = useState<any>(null)
@@ -84,6 +84,14 @@ export default function StrategicExecutive() {
     setLoading(true)
     try {
       console.log('🚀 Strategic Executive - PARALLEL LOADING START')
+      
+      // Test Supabase connection first
+      const isConnected = await testSupabaseConnection()
+      if (!isConnected) {
+        console.error('❌ Supabase connection failed, using mock data')
+        setLoading(false)
+        return
+      }
       
       // Fetch data from Supabase tables
       const { data: memberData, error: memberError } = await supabase
