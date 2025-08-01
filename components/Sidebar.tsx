@@ -36,6 +36,21 @@ export default function Sidebar({ user, onExpandedChange }: SidebarProps) {
     const fetchLastUpdate = async () => {
       try {
         console.log('🔄 Fetching MAX(DATE) from member_report_monthly...')
+        console.log('🔗 Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
+        console.log('🔑 Supabase Key exists:', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+        
+        // Test connection first
+        const { data: testData, error: testError } = await supabase
+          .from('member_report_monthly')
+          .select('count')
+          .limit(1)
+
+        if (testError) {
+          console.error('❌ Supabase connection test failed:', testError)
+          return
+        }
+        
+        console.log('✅ Supabase connection successful, table accessible')
         
         // Ambil MAX(DATE) dari kolom DATE
         const { data, error } = await supabase
@@ -49,8 +64,12 @@ export default function Sidebar({ user, onExpandedChange }: SidebarProps) {
           return
         }
 
+        console.log('📊 Raw data from query:', data)
+
         if (data && data.length > 0) {
           const maxDate = data[0].date
+          console.log('📅 Raw maxDate:', maxDate)
+          
           if (maxDate) {
             const date = new Date(maxDate)
             const formattedDate = date.toLocaleDateString('en-US', {
@@ -60,7 +79,11 @@ export default function Sidebar({ user, onExpandedChange }: SidebarProps) {
             })
             setLastUpdateDate(formattedDate)
             console.log('✅ MAX(DATE) set to:', formattedDate)
+          } else {
+            console.log('⚠️ No date found in data')
           }
+        } else {
+          console.log('⚠️ No data returned from query')
         }
       } catch (error) {
         console.error('❌ Error in fetchLastUpdate:', error)
