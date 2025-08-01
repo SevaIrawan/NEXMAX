@@ -141,8 +141,9 @@ export default function BarChart({
       y: {
         beginAtZero: true,
         ticks: {
-          callback: function(value: number) {
+          callback: function(tickValue: string | number) {
             // For all bar charts - plain numbers without currency
+            const value = typeof tickValue === 'string' ? parseFloat(tickValue) : tickValue;
             if (value >= 1000000) {
               return (value / 1000000).toFixed(1) + 'M';
             } else if (value >= 1000) {
