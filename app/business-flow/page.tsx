@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Layout from '../../components/Layout';
 import SubHeader from '../../components/SubHeader';
+import { YearSlicer, MonthSlicer, CurrencySlicer } from '../../components/slicers';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -283,154 +284,71 @@ export default function BusinessFlow() {
     },
   };
 
+  // Custom SubHeader dengan Slicer Controls Standard
+  const customSubHeader = (
+    <SubHeader title="">
+      <YearSlicer value={year} onChange={setYear} />
+      <MonthSlicer value={month} onChange={setMonth} />
+      <CurrencySlicer value={currency} onChange={setCurrency} />
+    </SubHeader>
+  );
+
   return (
     <Layout
       pageTitle="Business Flow"
       subHeaderTitle=""
+      customSubHeader={customSubHeader}
       darkMode={darkMode}
       sidebarExpanded={sidebarExpanded}
       onToggleDarkMode={() => setDarkMode(!darkMode)}
       onLogout={handleLogout}
     >
-      {/* CONTENT - BUSINESS FLOW MODULES */}
-      <div style={{
-        padding: '40px',
-        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-        minHeight: 'calc(100vh - 200px)'
-      }}>
+      <div className="business-flow-container">
         {/* MODULE 1: PPC Service */}
-        <div style={{
-          background: 'white',
-          borderRadius: '16px',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-          marginBottom: '40px',
-          overflow: 'hidden',
-          transition: 'all 0.3s ease'
-        }}>
-          <div style={{
-            background: 'white',
-            padding: '32px',
-            borderBottom: '1px solid #e2e8f0'
-          }}>
-            <h2 style={{
-              fontSize: '28px',
-              fontWeight: '700',
-              margin: '0 0 12px 0',
-              color: '#1e293b'
-            }}>
-              PPC Service Module
-            </h2>
-            <p style={{
-              fontSize: '16px',
-              opacity: 0.7,
-              margin: 0,
-              color: '#64748b'
-            }}>
+        <div className="module-card">
+          <div className="module-header">
+            <h3 className="module-title">PPC Service Module</h3>
+            <p className="module-description">
               New customer acquisition and group join metrics
             </p>
           </div>
           
-          <div style={{ padding: '32px' }}>
+          <div className="module-content">
             {/* KPI Section */}
-            <div style={{ marginBottom: '40px' }}>
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
-                gap: '24px' 
-              }}>
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0'
-                }}>
-                  <h4 style={{ margin: '0 0 12px 0', color: '#667eea', fontSize: '16px', fontWeight: '600' }}>
-                    NEW CUSTOMER CONVERSION RATE
-                  </h4>
-                  <div style={{ fontSize: '32px', fontWeight: '800', color: '#1e293b', marginBottom: '8px' }}>
-                    4.83%
-                  </div>
-                  <div style={{ color: '#ef4444', fontSize: '14px', fontWeight: '600' }}>
-                    ↘️ -28.23% vs Last Month
-                  </div>
+            <div className="kpi-section">
+              <div className="kpi-grid">
+                <div className="kpi-card">
+                  <h4 className="kpi-title">NEW CUSTOMER CONVERSION RATE</h4>
+                  <div className="kpi-value">4.83%</div>
+                  <div className="kpi-change negative">↘️ -28.23% vs Last Month</div>
                 </div>
                 
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0'
-                }}>
-                  <h4 style={{ margin: '0 0 12px 0', color: '#f093fb', fontSize: '16px', fontWeight: '600' }}>
-                    TOTAL NEW CUSTOMERS
-                  </h4>
-                  <div style={{ fontSize: '32px', fontWeight: '800', color: '#1e293b', marginBottom: '8px' }}>
-                    65
-                  </div>
-                  <div style={{ color: '#ef4444', fontSize: '14px', fontWeight: '600' }}>
-                    ↘️ -47.58% vs Last Month
-                  </div>
+                <div className="kpi-card">
+                  <h4 className="kpi-title">TOTAL NEW CUSTOMERS</h4>
+                  <div className="kpi-value">65</div>
+                  <div className="kpi-change negative">↘️ -47.58% vs Last Month</div>
                 </div>
                 
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0'
-                }}>
-                  <h4 style={{ margin: '0 0 12px 0', color: '#4facfe', fontSize: '16px', fontWeight: '600' }}>
-                    CUSTOMER GROUP JOIN VOLUME
-                  </h4>
-                  <div style={{ fontSize: '32px', fontWeight: '800', color: '#1e293b', marginBottom: '8px' }}>
-                    1,357
-                  </div>
-                  <div style={{ color: '#ef4444', fontSize: '14px', fontWeight: '600' }}>
-                    ↘️ -26.73% vs Last Month
-                  </div>
+                <div className="kpi-card">
+                  <h4 className="kpi-title">CUSTOMER GROUP JOIN VOLUME</h4>
+                  <div className="kpi-value">1,357</div>
+                  <div className="kpi-change negative">↘️ -26.73% vs Last Month</div>
                 </div>
               </div>
             </div>
             
             {/* Charts Section */}
-            <div style={{ marginBottom: '40px' }}>
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
-                gap: '24px' 
-              }}>
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0',
-                  height: '340px'
-                }}>
+            <div className="charts-section">
+              <div className="charts-grid">
+                <div className="chart-card">
                   <Line data={ppcLineData} options={chartOptions} />
                 </div>
                 
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0',
-                  height: '340px'
-                }}>
+                <div className="chart-card">
                   <Bar data={ppcBarData1} options={chartOptions} />
                 </div>
                 
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0',
-                  height: '340px'
-                }}>
+                <div className="chart-card">
                   <Bar data={ppcBarData2} options={chartOptions} />
                 </div>
               </div>
@@ -439,156 +357,56 @@ export default function BusinessFlow() {
         </div>
 
         {/* MODULE 2: First Depositor */}
-        <div style={{
-          background: 'white',
-          borderRadius: '16px',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-          marginBottom: '40px',
-          overflow: 'hidden',
-          transition: 'all 0.3s ease'
-        }}>
-          <div style={{
-            background: 'white',
-            padding: '32px',
-            borderBottom: '1px solid #e2e8f0'
-          }}>
-            <h2 style={{
-              fontSize: '28px',
-              fontWeight: '700',
-              margin: '0 0 12px 0',
-              color: '#1e293b'
-            }}>
-              First Depositor Module
-            </h2>
-            <p style={{
-              fontSize: '16px',
-              opacity: 0.7,
-              margin: 0,
-              color: '#64748b'
-            }}>
+        <div className="module-card">
+          <div className="module-header">
+            <h3 className="module-title">First Depositor Module</h3>
+            <p className="module-description">
               2nd deposit rates comparison between group and non-group members
             </p>
           </div>
           
-          <div style={{ padding: '32px' }}>
+          <div className="module-content">
             {/* KPI Section */}
-            <div style={{ marginBottom: '40px' }}>
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
-                gap: '24px' 
-              }}>
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0'
-                }}>
-                  <h4 style={{ margin: '0 0 12px 0', color: '#667eea', fontSize: '16px', fontWeight: '600' }}>
-                    2ND DEPOSIT RATE (IN GROUP)
-                  </h4>
-                  <div style={{ fontSize: '32px', fontWeight: '800', color: '#1e293b', marginBottom: '8px' }}>
-                    24.22%
-                  </div>
-                  <div style={{ color: '#ef4444', fontSize: '14px', fontWeight: '600' }}>
-                    ↘️ -15.31% vs Last Month
-                  </div>
+            <div className="kpi-section">
+              <div className="kpi-grid">
+                <div className="kpi-card">
+                  <h4 className="kpi-title">2ND DEPOSIT RATE (IN GROUP)</h4>
+                  <div className="kpi-value">24.22%</div>
+                  <div className="kpi-change negative">↘️ -15.31% vs Last Month</div>
                 </div>
                 
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0'
-                }}>
-                  <h4 style={{ margin: '0 0 12px 0', color: '#f093fb', fontSize: '16px', fontWeight: '600' }}>
-                    2ND DEPOSITS (IN GROUP)
-                  </h4>
-                  <div style={{ fontSize: '32px', fontWeight: '800', color: '#1e293b', marginBottom: '8px' }}>
-                    78
-                  </div>
-                  <div style={{ color: '#ef4444', fontSize: '14px', fontWeight: '600' }}>
-                    ↘️ -51.25% vs Last Month
-                  </div>
+                <div className="kpi-card">
+                  <h4 className="kpi-title">2ND DEPOSITS (IN GROUP)</h4>
+                  <div className="kpi-value">78</div>
+                  <div className="kpi-change negative">↘️ -51.25% vs Last Month</div>
                 </div>
                 
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0'
-                }}>
-                  <h4 style={{ margin: '0 0 12px 0', color: '#4facfe', fontSize: '16px', fontWeight: '600' }}>
-                    2ND DEPOSIT RATE (NOT IN GROUP)
-                  </h4>
-                  <div style={{ fontSize: '32px', fontWeight: '800', color: '#1e293b', marginBottom: '8px' }}>
-                    11.80%
-                  </div>
-                  <div style={{ color: '#ef4444', fontSize: '14px', fontWeight: '600' }}>
-                    ↘️ -28.53% vs Last Month
-                  </div>
+                <div className="kpi-card">
+                  <h4 className="kpi-title">2ND DEPOSIT RATE (NOT IN GROUP)</h4>
+                  <div className="kpi-value">11.80%</div>
+                  <div className="kpi-change negative">↘️ -28.53% vs Last Month</div>
                 </div>
                 
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0'
-                }}>
-                  <h4 style={{ margin: '0 0 12px 0', color: '#10b981', fontSize: '16px', fontWeight: '600' }}>
-                    2ND DEPOSITS (NOT IN GROUP)
-                  </h4>
-                  <div style={{ fontSize: '32px', fontWeight: '800', color: '#1e293b', marginBottom: '8px' }}>
-                    65
-                  </div>
-                  <div style={{ color: '#ef4444', fontSize: '14px', fontWeight: '600' }}>
-                    ↘️ -47.58% vs Last Month
-                  </div>
+                <div className="kpi-card">
+                  <h4 className="kpi-title">2ND DEPOSITS (NOT IN GROUP)</h4>
+                  <div className="kpi-value">65</div>
+                  <div className="kpi-change negative">↘️ -47.58% vs Last Month</div>
                 </div>
               </div>
             </div>
             
             {/* Charts Section */}
-            <div style={{ marginBottom: '40px' }}>
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
-                gap: '24px' 
-              }}>
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0',
-                  height: '340px'
-                }}>
+            <div className="charts-section">
+              <div className="charts-grid">
+                <div className="chart-card">
                   <Line data={firstDepositorLineData} options={chartOptions} />
                 </div>
                 
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0',
-                  height: '340px'
-                }}>
+                <div className="chart-card">
                   <Bar data={firstDepositorBarData1} options={chartOptions} />
                 </div>
                 
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0',
-                  height: '340px'
-                }}>
+                <div className="chart-card">
                   <Bar data={firstDepositorBarData2} options={chartOptions} />
                 </div>
               </div>
@@ -597,182 +415,70 @@ export default function BusinessFlow() {
         </div>
 
         {/* MODULE 3: Old Member */}
-        <div style={{
-          background: 'white',
-          borderRadius: '16px',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-          marginBottom: '40px',
-          overflow: 'hidden',
-          transition: 'all 0.3s ease'
-        }}>
-          <div style={{
-            background: 'white',
-            padding: '32px',
-            borderBottom: '1px solid #e2e8f0'
-          }}>
-            <h2 style={{
-              fontSize: '28px',
-              fontWeight: '700',
-              margin: '0 0 12px 0',
-              color: '#1e293b'
-            }}>
-              Old Member Module
-            </h2>
-            <p style={{
-              fontSize: '16px',
-              opacity: 0.7,
-              margin: 0,
-              color: '#64748b'
-            }}>
+        <div className="module-card">
+          <div className="module-header">
+            <h3 className="module-title">Old Member Module</h3>
+            <p className="module-description">
               Engagement, NPS, upgrade and churn metrics by tier
             </p>
           </div>
           
-          <div style={{ padding: '32px' }}>
+          <div className="module-content">
             {/* Row 1: 2 StatCard */}
-            <div style={{ marginBottom: '40px' }}>
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(2, 1fr)', 
-                gap: '24px' 
-              }}>
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0'
-                }}>
-                  <h4 style={{ margin: '0 0 12px 0', color: '#667eea', fontSize: '16px', fontWeight: '600' }}>
-                    TOTAL UPGRADED MEMBERS
-                  </h4>
-                  <div style={{ fontSize: '32px', fontWeight: '800', color: '#1e293b', marginBottom: '8px' }}>
-                    188
-                  </div>
-                  <div style={{ color: '#ef4444', fontSize: '14px', fontWeight: '600' }}>
-                    ↘️ -16.27% vs Last Month
-                  </div>
+            <div className="kpi-section">
+              <div className="kpi-grid two-columns">
+                <div className="kpi-card">
+                  <h4 className="kpi-title">TOTAL UPGRADED MEMBERS</h4>
+                  <div className="kpi-value">188</div>
+                  <div className="kpi-change negative">↘️ -16.27% vs Last Month</div>
                 </div>
                 
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0'
-                }}>
-                  <h4 style={{ margin: '0 0 12px 0', color: '#f093fb', fontSize: '16px', fontWeight: '600' }}>
-                    TOTAL CHURNED MEMBERS
-                  </h4>
-                  <div style={{ fontSize: '32px', fontWeight: '800', color: '#1e293b', marginBottom: '8px' }}>
-                    128
-                  </div>
-                  <div style={{ color: '#ef4444', fontSize: '14px', fontWeight: '600' }}>
-                    ↘️ -12.91% vs Last Month
-                  </div>
+                <div className="kpi-card">
+                  <h4 className="kpi-title">TOTAL CHURNED MEMBERS</h4>
+                  <div className="kpi-value">128</div>
+                  <div className="kpi-change negative">↘️ -12.91% vs Last Month</div>
                 </div>
               </div>
             </div>
             
             {/* Row 2: 3 Bar Chart */}
-            <div style={{ marginBottom: '40px' }}>
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(3, 1fr)', 
-                gap: '24px' 
-              }}>
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0',
-                  height: '300px'
-                }}>
+            <div className="charts-section">
+              <div className="charts-grid three-columns">
+                <div className="chart-card">
                   <Bar data={oldMemberBarData1} options={chartOptions} />
                 </div>
                 
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0',
-                  height: '300px'
-                }}>
+                <div className="chart-card">
                   <Bar data={oldMemberBarData2} options={chartOptions} />
                 </div>
                 
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0',
-                  height: '300px'
-                }}>
+                <div className="chart-card">
                   <Bar data={oldMemberBarData3} options={chartOptions} />
                 </div>
               </div>
             </div>
             
             {/* Row 3: 2 Line Chart */}
-            <div style={{ marginBottom: '40px' }}>
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(2, 1fr)', 
-                gap: '24px' 
-              }}>
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0',
-                  height: '300px'
-                }}>
+            <div className="charts-section">
+              <div className="charts-grid two-columns">
+                <div className="chart-card">
                   <Line data={oldMemberLineData1} options={chartOptions} />
                 </div>
                 
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0',
-                  height: '300px'
-                }}>
+                <div className="chart-card">
                   <Line data={oldMemberLineData2} options={chartOptions} />
                 </div>
               </div>
             </div>
             
             {/* Row 4: 1 Bar Chart + 1 Line Chart */}
-            <div style={{ marginBottom: '40px' }}>
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(2, 1fr)', 
-                gap: '24px' 
-              }}>
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0',
-                  height: '340px'
-                }}>
+            <div className="charts-section">
+              <div className="charts-grid two-columns">
+                <div className="chart-card">
                   <Bar data={oldMemberBarData4} options={chartOptions} />
                 </div>
                 
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0',
-                  height: '340px'
-                }}>
+                <div className="chart-card">
                   <Line data={oldMemberLineData3} options={chartOptions} />
                 </div>
               </div>
@@ -781,138 +487,50 @@ export default function BusinessFlow() {
         </div>
 
         {/* MODULE 4: Traffic Executive */}
-        <div style={{
-          background: 'white',
-          borderRadius: '16px',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-          marginBottom: '40px',
-          overflow: 'hidden',
-          transition: 'all 0.3s ease'
-        }}>
-          <div style={{
-            background: 'white',
-            padding: '32px',
-            borderBottom: '1px solid #e2e8f0'
-          }}>
-            <h2 style={{
-              fontSize: '28px',
-              fontWeight: '700',
-              margin: '0 0 12px 0',
-              color: '#1e293b'
-            }}>
-              Traffic Executive Module
-            </h2>
-            <p style={{
-              fontSize: '16px',
-              opacity: 0.7,
-              margin: 0,
-              color: '#64748b'
-            }}>
+        <div className="module-card">
+          <div className="module-header">
+            <h3 className="module-title">Traffic Executive Module</h3>
+            <p className="module-description">
               Customer reactivation and transfer success metrics
             </p>
           </div>
           
-          <div style={{ padding: '32px' }}>
+          <div className="module-content">
             {/* KPI Section */}
-            <div style={{ marginBottom: '40px' }}>
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
-                gap: '24px' 
-              }}>
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0'
-                }}>
-                  <h4 style={{ margin: '0 0 12px 0', color: '#667eea', fontSize: '16px', fontWeight: '600' }}>
-                    CUSTOMER TRANSFER SUCCESS RATE
-                  </h4>
-                  <div style={{ fontSize: '32px', fontWeight: '800', color: '#1e293b', marginBottom: '8px' }}>
-                    80.49%
-                  </div>
-                  <div style={{ color: '#ef4444', fontSize: '14px', fontWeight: '600' }}>
-                    ↘️ -7.27% vs Last Month
-                  </div>
+            <div className="kpi-section">
+              <div className="kpi-grid">
+                <div className="kpi-card">
+                  <h4 className="kpi-title">CUSTOMER TRANSFER SUCCESS RATE</h4>
+                  <div className="kpi-value">80.49%</div>
+                  <div className="kpi-change negative">↘️ -7.27% vs Last Month</div>
                 </div>
                 
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0'
-                }}>
-                  <h4 style={{ margin: '0 0 12px 0', color: '#f093fb', fontSize: '16px', fontWeight: '600' }}>
-                    TARGET COMPLETION
-                  </h4>
-                  <div style={{ fontSize: '32px', fontWeight: '800', color: '#1e293b', marginBottom: '8px' }}>
-                    94.70%
-                  </div>
-                  <div style={{ color: '#ef4444', fontSize: '14px', fontWeight: '600' }}>
-                    ↘️ -5.30% vs Last Month
-                  </div>
+                <div className="kpi-card">
+                  <h4 className="kpi-title">TARGET COMPLETION</h4>
+                  <div className="kpi-value">94.70%</div>
+                  <div className="kpi-change negative">↘️ -5.30% vs Last Month</div>
                 </div>
                 
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0'
-                }}>
-                  <h4 style={{ margin: '0 0 12px 0', color: '#4facfe', fontSize: '16px', fontWeight: '600' }}>
-                    TOTAL REACTIVATED CUSTOMERS
-                  </h4>
-                  <div style={{ fontSize: '32px', fontWeight: '800', color: '#1e293b', marginBottom: '8px' }}>
-                    978
-                  </div>
-                  <div style={{ color: '#ef4444', fontSize: '14px', fontWeight: '600' }}>
-                    ↘️ -23.65% vs Last Month
-                  </div>
+                <div className="kpi-card">
+                  <h4 className="kpi-title">TOTAL REACTIVATED CUSTOMERS</h4>
+                  <div className="kpi-value">978</div>
+                  <div className="kpi-change negative">↘️ -23.65% vs Last Month</div>
                 </div>
               </div>
             </div>
             
             {/* Charts Section */}
-            <div style={{ marginBottom: '40px' }}>
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
-                gap: '24px' 
-              }}>
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0',
-                  height: '340px'
-                }}>
+            <div className="charts-section">
+              <div className="charts-grid">
+                <div className="chart-card">
                   <Bar data={trafficBarData1} options={chartOptions} />
                 </div>
                 
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0',
-                  height: '340px'
-                }}>
+                <div className="chart-card">
                   <Bar data={trafficBarData2} options={chartOptions} />
                 </div>
                 
-                <div style={{
-                  background: 'white',
-                  padding: '32px',
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0',
-                  height: '340px'
-                }}>
+                <div className="chart-card">
                   <Doughnut data={trafficDonutData} options={donutOptions} />
                 </div>
               </div>
@@ -920,6 +538,168 @@ export default function BusinessFlow() {
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .business-flow-container {
+          padding: 24px;
+          height: 100%;
+          background-color: #f8f9fa;
+        }
+
+        .module-card {
+          background: white;
+          border-radius: 12px;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          border: 1px solid #e5e7eb;
+          margin-bottom: 24px;
+          overflow: hidden;
+          transition: all 0.3s ease;
+        }
+
+        .module-header {
+          padding: 24px 32px;
+          border-bottom: 1px solid #e5e7eb;
+          background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+
+        .module-title {
+          font-size: 20px;
+          font-weight: 700;
+          color: #1f2937;
+          margin: 0 0 8px 0;
+        }
+
+        .module-description {
+          font-size: 14px;
+          color: #6b7280;
+          margin: 0;
+        }
+
+        .module-content {
+          padding: 24px 32px;
+        }
+
+        .kpi-section {
+          margin-bottom: 32px;
+        }
+
+        .kpi-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 20px;
+        }
+
+        .kpi-grid.two-columns {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .kpi-card {
+          background: white;
+          padding: 24px;
+          border-radius: 12px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+          border: 1px solid #e5e7eb;
+          transition: all 0.2s ease;
+        }
+
+        .kpi-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .kpi-title {
+          font-size: 12px;
+          font-weight: 600;
+          color: #6b7280;
+          margin: 0 0 8px 0;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .kpi-value {
+          font-size: 28px;
+          font-weight: 800;
+          color: #1f2937;
+          margin-bottom: 8px;
+        }
+
+        .kpi-change {
+          font-size: 12px;
+          font-weight: 600;
+        }
+
+        .kpi-change.negative {
+          color: #ef4444;
+        }
+
+        .kpi-change.positive {
+          color: #10b981;
+        }
+
+        .charts-section {
+          margin-bottom: 32px;
+        }
+
+        .charts-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+          gap: 20px;
+        }
+
+        .charts-grid.two-columns {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .charts-grid.three-columns {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        .chart-card {
+          background: white;
+          padding: 24px;
+          border-radius: 12px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+          border: 1px solid #e5e7eb;
+          height: 320px;
+          transition: all 0.2s ease;
+        }
+
+        .chart-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+          .business-flow-container {
+            padding: 16px;
+          }
+          
+          .module-content {
+            padding: 16px 20px;
+          }
+          
+          .kpi-grid {
+            grid-template-columns: 1fr;
+          }
+          
+          .kpi-grid.two-columns {
+            grid-template-columns: 1fr;
+          }
+          
+          .charts-grid {
+            grid-template-columns: 1fr;
+          }
+          
+          .charts-grid.two-columns,
+          .charts-grid.three-columns {
+            grid-template-columns: 1fr;
+          }
+          
+          .chart-card {
+            height: 280px;
+          }
+        }
+      `}</style>
     </Layout>
   );
 }

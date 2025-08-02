@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Header from './Header'
 import Sidebar from './Sidebar'
 import SubHeader from './SubHeader'
+import AccessControl from './AccessControl'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -29,32 +30,34 @@ export default function Layout({
   const [sidebarOpen, setSidebarOpen] = useState(sidebarExpanded)
 
   return (
-    <div className="main-container">
-      <Sidebar 
-        sidebarOpen={sidebarOpen} 
-        setSidebarOpen={setSidebarOpen}
-        darkMode={darkMode}
-        onToggleDarkMode={onToggleDarkMode}
-        onLogout={onLogout}
-        sidebarExpanded={sidebarExpanded}
-      />
-      
-      <Header 
-        pageTitle={pageTitle}
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
-        darkMode={darkMode}
-        onToggleDarkMode={onToggleDarkMode}
-        onLogout={onLogout}
-      />
-      
-      <div className={`subheader ${!sidebarOpen ? 'collapsed' : ''}`}>
-        {customSubHeader || <SubHeader title={subHeaderTitle || ' '} />}
+    <AccessControl>
+      <div className="main-container">
+        <Sidebar 
+          sidebarOpen={sidebarOpen} 
+          setSidebarOpen={setSidebarOpen}
+          darkMode={darkMode}
+          onToggleDarkMode={onToggleDarkMode}
+          onLogout={onLogout}
+          sidebarExpanded={sidebarExpanded}
+        />
+        
+        <Header 
+          pageTitle={pageTitle}
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          darkMode={darkMode}
+          onToggleDarkMode={onToggleDarkMode}
+          onLogout={onLogout}
+        />
+        
+        <div className={`subheader ${!sidebarOpen ? 'collapsed' : ''}`}>
+          {customSubHeader || <SubHeader title={subHeaderTitle || ' '} />}
+        </div>
+        
+        <div className={`main-content ${!sidebarOpen ? 'collapsed' : ''}`}>
+          {children}
+        </div>
       </div>
-      
-      <div className={`main-content ${!sidebarOpen ? 'collapsed' : ''}`}>
-        {children}
-      </div>
-    </div>
+    </AccessControl>
   )
 } 

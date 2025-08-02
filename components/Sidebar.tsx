@@ -1,9 +1,23 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
+import { 
+  DashboardIcon, 
+  StrategyIcon, 
+  FlowIcon, 
+  GrowthIcon, 
+  SalesIcon, 
+  ExecutiveOptimizationIcon, 
+  ManagementIcon, 
+  TransactionIcon, 
+  SupabaseIcon, 
+  UserIcon,
+  USCIcon
+} from './Icons'
+import { getMenuItemsByRole, hasPermission } from '@/utils/rolePermissions'
 
 interface SidebarProps {
   sidebarOpen: boolean
@@ -35,10 +49,17 @@ export default function Sidebar({
     return () => clearInterval(interval)
   }, [])
 
-  // Auto show sub menu ketika user berada di halaman sub menu
+  // STANDARD SUB MENU RULES:
+  // 1. Auto show sub menu ketika user berada di halaman sub menu
+  // 2. Toggle sub menu ketika user klik menu yang sama
+  // 3. Auto hide sub menu ketika user klik menu lain
+  // 4. Highlight icon ketika sub menu aktif
+  // 5. Scroll hanya untuk sub menu dengan styling konsisten
   useEffect(() => {
     if (pathname.startsWith('/transaction/')) {
       setOpenSubmenu('Transaction')
+    } else if (pathname.startsWith('/usc/')) {
+      setOpenSubmenu('USC')
     }
   }, [pathname])
 
@@ -136,67 +157,115 @@ export default function Sidebar({
     }
   }
 
-  const menuItems = [
-    {
-      title: 'Dashboard',
-      path: '/dashboard',
-      icon: '📊'
-    },
-    {
-      title: 'Strategic Executive',
-      path: '/strategic-executive',
-      icon: '🎯'
-    },
-    {
-      title: 'Business Flow',
-      path: '/business-flow',
-      icon: '🔄'
-    },
-    {
-      title: 'BGO',
-      path: '/bgo',
-      icon: '📈'
-    },
-    {
-      title: 'SR',
-      path: '/sr',
-      icon: '👥'
-    },
-    {
-      title: 'XOO',
-      path: '/xoo',
-      icon: '⚡'
-    },
-    {
-      title: 'OS',
-      path: '/os',
-      icon: '🔧'
-    },
-    {
-      title: 'Transaction',
-      icon: '💳',
-      submenu: [
-        { title: 'Adjustment', path: '/transaction/adjustment' },
-        { title: 'Deposit', path: '/transaction/deposit' },
-        { title: 'Withdraw', path: '/transaction/withdraw' },
-        { title: 'Exchange', path: '/transaction/exchange' },
-        { title: 'Headcount', path: '/transaction/headcount' },
-        { title: 'New Depositor', path: '/transaction/new-depositor' },
-        { title: 'New Register', path: '/transaction/new-register' },
-        { title: 'VIP Program', path: '/transaction/vip-program' }
-      ]
-    },
-    {
-      title: 'Supabase',
-      path: '/connection-test',
-      icon: '🔌'
-    },
-    {
-      title: 'Users',
-      path: '/users',
-      icon: '👤'
+  // Get user role from session
+  const getUserRole = () => {
+    try {
+      const session = localStorage.getItem('nexmax_session')
+      if (session) {
+        const sessionData = JSON.parse(session)
+        return sessionData.role || 'user'
+      }
+    } catch (error) {
+      console.error('Error getting user role:', error)
     }
-  ]
+    return 'user'
+  }
+
+  const userRole = getUserRole()
+  
+  // Get menu items based on user role
+  const getMenuItems = () => {
+    const roleMenuItems = getMenuItemsByRole(userRole)
+    
+    // Map role menu items to full menu items with icons and submenus
+    const fullMenuItems = [
+      {
+        title: 'Dashboard',
+        path: '/dashboard',
+        icon: <DashboardIcon size={16} color="#ffffff" />,
+        permission: 'dashboard'
+      },
+      {
+        title: 'Strategic Executive',
+        path: '/strategic-executive',
+        icon: <StrategyIcon size={16} color="#ffffff" />,
+        permission: 'strategic-executive'
+      },
+      {
+        title: 'Business Flow',
+        path: '/business-flow',
+        icon: <FlowIcon size={16} color="#ffffff" />,
+        permission: 'business-flow'
+      },
+      {
+        title: 'USC',
+        icon: <USCIcon size={16} color="#ffffff" />,
+        permission: 'usc',
+        submenu: [
+          { title: 'Overview', path: '/usc/overview' },
+          { title: 'Sales', path: '/usc/sales' }
+        ]
+      },
+      {
+        title: 'Business Growth Optimization',
+        path: '/bgo',
+        icon: <GrowthIcon size={16} color="#ffffff" />,
+        permission: 'bgo'
+      },
+      {
+        title: 'Sales & Revenue',
+        path: '/sr',
+        icon: <SalesIcon size={16} color="#ffffff" />,
+        permission: 'sr'
+      },
+      {
+        title: 'Executive Operation & Optimization',
+        path: '/xoo',
+        icon: <ExecutiveOptimizationIcon size={16} color="#ffffff" />,
+        permission: 'xoo'
+      },
+      {
+        title: 'Operations & Support Management',
+        path: '/os',
+        icon: <ManagementIcon size={16} color="#ffffff" />,
+        permission: 'os'
+      },
+      {
+        title: 'Transaction',
+        icon: <TransactionIcon size={16} color="#ffffff" />,
+        permission: 'transaction',
+        submenu: [
+          { title: 'Adjustment', path: '/transaction/adjustment' },
+          { title: 'Deposit', path: '/transaction/deposit' },
+          { title: 'Withdraw', path: '/transaction/withdraw' },
+          { title: 'Exchange', path: '/transaction/exchange' },
+          { title: 'Headcount', path: '/transaction/headcount' },
+          { title: 'New Depositor', path: '/transaction/new-depositor' },
+          { title: 'New Register', path: '/transaction/new-register' },
+          { title: 'VIP Program', path: '/transaction/vip-program' }
+        ]
+      },
+      {
+        title: 'Supabase',
+        path: '/connection-test',
+        icon: <SupabaseIcon size={16} color="#ffffff" />,
+        permission: 'supabase'
+      },
+      {
+        title: 'User Management',
+        path: '/users',
+        icon: <UserIcon size={16} color="#ffffff" />,
+        permission: 'users'
+      }
+    ]
+
+    // Filter menu items based on user permissions
+    return fullMenuItems.filter(item => 
+      roleMenuItems.some(roleItem => roleItem.permission === item.permission)
+    )
+  }
+
+  const menuItems = getMenuItems()
 
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null)
 
@@ -211,13 +280,28 @@ export default function Sidebar({
     }
   }
 
+  // HELPER FUNCTIONS FOR STANDARD SUB MENU RULES:
+  // Helper function untuk mendeteksi sub menu secara dinamis
+  // Tambahkan path baru di sini untuk menambah sub menu baru
+  const isSubmenuPath = (path: string) => {
+    return path.startsWith('/transaction/') || path.startsWith('/usc/')
+  }
+
+  // Helper function untuk mendapatkan parent menu dari path
+  // Tambahkan mapping baru di sini untuk menambah sub menu baru
+  const getParentMenuFromPath = (path: string) => {
+    if (path.startsWith('/transaction/')) return 'Transaction'
+    if (path.startsWith('/usc/')) return 'USC'
+    return null
+  }
+
   const handleMenuClick = (path: string) => {
-    // Cek apakah path ini adalah sub menu dari Transaction
-    const isSubmenuPath = path.startsWith('/transaction/')
+    // Cek apakah path ini adalah sub menu dari menu manapun
+    const parentMenu = getParentMenuFromPath(path)
     
-    if (isSubmenuPath) {
-      // Jika user klik sub menu, tetap buka sub menu Transaction
-      setOpenSubmenu('Transaction')
+    if (parentMenu) {
+      // Jika user klik sub menu, tetap buka sub menu parent
+      setOpenSubmenu(parentMenu)
     } else {
       // Jika user klik menu lain (bukan sub menu), tutup sub menu
       setOpenSubmenu(null)
@@ -227,21 +311,23 @@ export default function Sidebar({
   }
 
   return (
-    <div 
-      className={`sidebar ${!sidebarOpen ? 'collapsed' : ''}`}
-      style={{ backgroundColor: '#1f2937' }} // Dark blue background
-    >
+         <div 
+       className={`sidebar ${!sidebarOpen ? 'collapsed' : ''}`}
+       style={{ 
+         backgroundColor: '#1f2937' // Dark blue background
+       }}
+     >
       {/* Logo Section with Circular Gold Border */}
-      <div style={{
-        padding: '20px',
-        borderBottom: '1px solid #374151', // Darker border for dark blue
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: sidebarOpen ? 'flex-start' : 'center',
-        minHeight: '80px',
-        flexShrink: 0, // Prevent logo section from shrinking
-        backgroundColor: '#1f2937' // Dark blue background
-      }}>
+             <div style={{
+         padding: sidebarOpen ? '20px' : '20px 0',
+         borderBottom: '1px solid #374151', // Darker border for dark blue
+         display: 'flex',
+         alignItems: 'center',
+         justifyContent: sidebarOpen ? 'flex-start' : 'center',
+         minHeight: '80px',
+         flexShrink: 0, // Prevent logo section from shrinking
+         backgroundColor: '#1f2937' // Dark blue background
+       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{
             width: '50px',
@@ -278,33 +364,77 @@ export default function Sidebar({
       </div>
 
       {/* Menu Items - NO SCROLL */}
-      <div style={{
-        flex: 1,
-        overflow: 'hidden', // NO SCROLL for main menu
-        padding: '16px 0',
-        backgroundColor: '#1f2937' // Dark blue background
-      }}>
+             <div style={{
+         flex: 1,
+         overflow: 'hidden', // NO SCROLL for main menu
+         padding: '16px 0',
+         backgroundColor: '#1f2937', // Dark blue background
+         display: 'flex',
+         flexDirection: 'column',
+         alignItems: sidebarOpen ? 'stretch' : 'center'
+       }}>
         {menuItems.map((item, index) => (
           <div key={index}>
             {item.submenu ? (
               <div>
-                <div
-                  onClick={() => toggleSubmenu(item.title)}
-                  style={{
-                    padding: '12px 20px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: sidebarOpen ? 'space-between' : 'center',
-                    backgroundColor: openSubmenu === item.title ? '#374151' : 'transparent', // Darker blue for active
-                    transition: 'background-color 0.2s ease',
-                    color: '#ffffff'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <span style={{ fontSize: '16px' }}>{item.icon}</span>
+                                 <div
+                   onClick={() => toggleSubmenu(item.title)}
+                   style={{
+                     padding: sidebarOpen ? '12px 20px' : '12px 0',
+                     cursor: 'pointer',
+                     display: 'flex',
+                     alignItems: 'center',
+                     justifyContent: sidebarOpen ? 'space-between' : 'center',
+                     backgroundColor: openSubmenu === item.title ? '#374151' : 'transparent', // Darker blue for active
+                     transition: 'all 0.2s ease',
+                     color: '#ffffff'
+                   }}
+                   onMouseEnter={(e) => {
+                     e.currentTarget.style.backgroundColor = '#374151'
+                     // Highlight icon on hover
+                     const iconElement = e.currentTarget.querySelector('[data-icon]') as HTMLElement
+                     if (iconElement) {
+                       iconElement.style.color = '#3b82f6' // Bright blue
+                     }
+                   }}
+                   onMouseLeave={(e) => {
+                     e.currentTarget.style.backgroundColor = openSubmenu === item.title ? '#374151' : 'transparent'
+                     // Reset icon color on leave
+                     const iconElement = e.currentTarget.querySelector('[data-icon]') as HTMLElement
+                     if (iconElement) {
+                       iconElement.style.color = '#ffffff'
+                     }
+                   }}
+                 >
+                   <div style={{ 
+                     display: 'flex', 
+                     alignItems: 'center', 
+                     gap: sidebarOpen ? '12px' : '0',
+                     justifyContent: sidebarOpen ? 'flex-start' : 'center',
+                     width: sidebarOpen ? 'auto' : '100%'
+                   }}>
+                     <div 
+                       style={{ 
+                         display: 'flex', 
+                         alignItems: 'center', 
+                         justifyContent: 'center', 
+                         width: '16px',
+                         flexShrink: 0
+                       }}
+                       data-icon="true"
+                     >
+                       {React.cloneElement(item.icon, {
+                         color: (isSubmenuPath(pathname) && openSubmenu === item.title) ? '#3b82f6' : '#ffffff'
+                       })}
+                     </div>
                     {sidebarOpen && (
-                      <span style={{ fontSize: '14px', color: '#ffffff' }}>{item.title}</span>
+                      <span style={{ 
+                        fontSize: '12px', 
+                        color: '#ffffff',
+                        lineHeight: '1.2',
+                        wordWrap: 'break-word',
+                        maxWidth: '140px'
+                      }}>{item.title}</span>
                     )}
                   </div>
                   {sidebarOpen && (
@@ -326,21 +456,27 @@ export default function Sidebar({
                   className="sidebar-submenu"
                 >
                     {item.submenu.map((subItem, subIndex) => (
-                      <div
-                        key={subIndex}
-                        onClick={() => handleMenuClick(subItem.path)}
-                        style={{
-                          padding: '8px 20px 8px 52px',
-                          cursor: 'pointer',
-                          fontSize: '13px',
-                          backgroundColor: pathname === subItem.path ? '#374151' : 'transparent', // Darker blue for active submenu item
-                          transition: 'background-color 0.2s ease',
-                          color: '#ffffff',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px'
-                        }}
-                      >
+                                             <div
+                         key={subIndex}
+                         onClick={() => handleMenuClick(subItem.path)}
+                         style={{
+                           padding: '8px 20px 8px 52px',
+                           cursor: 'pointer',
+                           fontSize: '13px',
+                           backgroundColor: pathname === subItem.path ? '#374151' : 'transparent', // Darker blue for active submenu item
+                           transition: 'all 0.2s ease',
+                           color: '#ffffff',
+                           display: 'flex',
+                           alignItems: 'center',
+                           gap: '8px'
+                         }}
+                         onMouseEnter={(e) => {
+                           e.currentTarget.style.backgroundColor = '#374151'
+                         }}
+                         onMouseLeave={(e) => {
+                           e.currentTarget.style.backgroundColor = pathname === subItem.path ? '#374151' : 'transparent'
+                         }}
+                       >
                         {/* White Bullet Point */}
                         <span style={{
                           width: '4px',
@@ -356,22 +492,58 @@ export default function Sidebar({
                 )}
               </div>
             ) : (
-              <div
-                onClick={() => handleMenuClick(item.path)}
-                style={{
-                  padding: '12px 20px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  backgroundColor: pathname === item.path ? '#374151' : 'transparent', // Darker blue for active
-                  transition: 'background-color 0.2s ease',
-                  color: '#ffffff'
-                }}
-              >
-                <span style={{ fontSize: '16px' }}>{item.icon}</span>
+                             <div
+                 onClick={() => handleMenuClick(item.path)}
+                 style={{
+                   padding: sidebarOpen ? '12px 20px' : '12px 0',
+                   cursor: 'pointer',
+                   display: 'flex',
+                   alignItems: 'center',
+                   justifyContent: sidebarOpen ? 'flex-start' : 'center',
+                   gap: sidebarOpen ? '12px' : '0',
+                   backgroundColor: pathname === item.path ? '#374151' : 'transparent', // Darker blue for active
+                   transition: 'all 0.2s ease',
+                   color: '#ffffff'
+                 }}
+                 onMouseEnter={(e) => {
+                   e.currentTarget.style.backgroundColor = '#374151'
+                   // Highlight icon on hover
+                   const iconElement = e.currentTarget.querySelector('[data-icon]') as HTMLElement
+                   if (iconElement) {
+                     iconElement.style.color = '#3b82f6' // Bright blue
+                   }
+                 }}
+                 onMouseLeave={(e) => {
+                   e.currentTarget.style.backgroundColor = pathname === item.path ? '#374151' : 'transparent'
+                   // Reset icon color on leave
+                   const iconElement = e.currentTarget.querySelector('[data-icon]') as HTMLElement
+                   if (iconElement) {
+                     iconElement.style.color = '#ffffff'
+                   }
+                 }}
+               >
+                 <div 
+                   style={{ 
+                     display: 'flex', 
+                     alignItems: 'center', 
+                     justifyContent: 'center', 
+                     width: '16px',
+                     flexShrink: 0
+                   }}
+                   data-icon="true"
+                 >
+                   {React.cloneElement(item.icon, {
+                     color: pathname === item.path ? '#3b82f6' : '#ffffff'
+                   })}
+                 </div>
                 {sidebarOpen && (
-                  <span style={{ fontSize: '14px', color: '#ffffff' }}>{item.title}</span>
+                  <span style={{ 
+                    fontSize: '12px', 
+                    color: '#ffffff',
+                    lineHeight: '1.2',
+                    wordWrap: 'break-word',
+                    maxWidth: '140px'
+                  }}>{item.title}</span>
                 )}
               </div>
             )}

@@ -2,23 +2,22 @@
 
 interface SubHeaderProps {
   title: string
+  children?: React.ReactNode
 }
 
-export default function SubHeader({ title }: SubHeaderProps) {
-  // Don't render h2 if title is empty or just whitespace
-  if (!title || title.trim() === '') {
-    return (
-      <div className="subheader">
-        {/* Empty sub header - just for layout structure */}
-      </div>
-    )
-  }
-
+export default function SubHeader({ title, children }: SubHeaderProps) {
   return (
     <div className="subheader">
-      <h2>
-        {title}
-      </h2>
+      <div className="subheader-content">
+        {title && title.trim() !== '' && (
+          <h2>{title}</h2>
+        )}
+        {children && (
+          <div className="subheader-controls">
+            {children}
+          </div>
+        )}
+      </div>
     </div>
   )
 } 

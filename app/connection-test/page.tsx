@@ -332,10 +332,10 @@ export default function ConnectionTest() {
       subHeaderTitle=""
     >
       <div style={{ 
-        padding: '16px',
+        padding: '24px',
         width: '100%',
-        height: 'calc(100vh - 140px)', // Fixed height - 1 frame
-        overflow: 'hidden' // No scroll
+        height: '100%',
+        overflow: 'hidden' // No scroll di luar sama sekali
       }}>
         {/* Side by Side Layout: StatCards + Real Time Logs Chart */}
         <div style={{
@@ -347,13 +347,15 @@ export default function ConnectionTest() {
           {/* StatCards (KPI Cards) - 3 COLUMNS LAYOUT */}
           <div style={{
             backgroundColor: '#ffffff',
-            padding: '20px',
-            borderRadius: '10px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            padding: '24px',
+            borderRadius: '12px',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
             border: '1px solid #e5e7eb',
             flex: '2',
-            overflow: 'auto',
-            height: '100%'
+            overflow: 'auto', // Scroll hanya di sub content
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column'
           }}>
             {/* Header dengan Last Update di kanan atas */}
             <div style={{
@@ -402,13 +404,14 @@ export default function ConnectionTest() {
                 🔄 Testing REAL database connection...
               </div>
             ) : (
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '12px',
-                maxWidth: '100%',
-                height: 'calc(100% - 50px)' // Remaining height after title
-              }}>
+                          <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '12px',
+              maxWidth: '100%',
+              flex: '1',
+              overflow: 'auto' // Scroll hanya di content area
+            }}>
                 {tables.map((table, index) => (
                   <div key={index} style={{
                     backgroundColor: '#f8f9fa',
@@ -498,13 +501,15 @@ export default function ConnectionTest() {
           {/* Real Time Logs Chart - SIDE BY SIDE */}
           <div style={{
             backgroundColor: '#ffffff',
-            padding: '20px',
-            borderRadius: '10px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            padding: '24px',
+            borderRadius: '12px',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
             border: '1px solid #e5e7eb',
             flex: '1',
-            overflow: 'auto',
-            height: '100%'
+            overflow: 'auto', // Scroll hanya di sub content
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column'
           }}>
             {/* Header dengan Connected status di kanan atas */}
             <div style={{
@@ -543,8 +548,8 @@ export default function ConnectionTest() {
               backgroundColor: '#1f2937',
               borderRadius: '6px',
               padding: '12px',
-              height: 'calc(100% - 50px)',
-              overflowY: 'auto',
+              flex: '1',
+              overflowY: 'auto', // Scroll hanya di dalam logs area
               fontFamily: 'monospace',
               width: '100%'
             }}>

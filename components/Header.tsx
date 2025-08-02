@@ -1,7 +1,9 @@
 'use client'
 
 import { useRouter, usePathname } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import { getRoleDisplayName } from '@/utils/rolePermissions'
 
 interface HeaderProps {
   pageTitle?: string
@@ -22,6 +24,23 @@ export default function Header({
 }: HeaderProps) {
   const router = useRouter()
   const pathname = usePathname()
+  const [userInfo, setUserInfo] = useState<{username: string, role: string} | null>(null)
+
+  useEffect(() => {
+    // Get user info from session
+    try {
+      const session = localStorage.getItem('nexmax_session')
+      if (session) {
+        const sessionData = JSON.parse(session)
+        setUserInfo({
+          username: sessionData.username || 'User',
+          role: sessionData.role || 'user'
+        })
+      }
+    } catch (error) {
+      console.error('Error getting user info:', error)
+    }
+  }, [])
 
   const getPageTitle = () => {
     if (pageTitle) return pageTitle
@@ -36,13 +55,17 @@ export default function Header({
       case '/business-flow':
         return 'Business Flow'
       case '/bgo':
-        return 'BGO'
+        return 'Business Growth Optimization'
       case '/sr':
-        return 'SR'
+        return 'Sales & Revenue'
       case '/xoo':
-        return 'XOO'
+        return 'Executive Operation & Optimization'
       case '/os':
-        return 'OS'
+        return 'Operations & Support Management'
+      case '/usc/overview':
+        return 'USC Overview'
+      case '/usc/sales':
+        return 'USC Sales'
       case '/transaction/deposit':
         return 'Deposit'
       case '/transaction/withdraw':
@@ -97,10 +120,14 @@ export default function Header({
             ☰
           </button>
           <h1 style={{ 
-            fontSize: '24px', 
+            fontSize: '20px', 
             fontWeight: '600', 
             color: '#ffffff',
-            margin: 0
+            margin: 0,
+            lineHeight: '1.2',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
           }}>
             {getPageTitle()}
           </h1>
@@ -110,7 +137,7 @@ export default function Header({
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ fontSize: '16px' }}>👋</span>
             <span style={{ fontSize: '14px', color: '#ffffff' }}>
-              Welcome, <strong>admin</strong>
+              Welcome, <strong>{userInfo?.username || 'User'}</strong>
             </span>
           </div>
 

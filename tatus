@@ -1,5 +1,0 @@
-[33m25eee39[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m  Fix Layout Props Error - Deploy Ready
-[33m207bfa9[m  Supabase Connection Test Page - Complete & Working
-[33mf443fd8[m Fix Supabase connection with direct config - bypass .env.local issues
-[33m9a5085d[m Fix: Improve Supabase connection with better error handling and test function
-[33m447c0c1[m Fix: Update BarChart callback function to handle string | number type for Chart.js compatibility
