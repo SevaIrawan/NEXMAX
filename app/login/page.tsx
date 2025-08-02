@@ -110,247 +110,203 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'linear-gradient(135deg, #87CEEB 0%, #4682B4 100%)',
-      padding: '20px',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-    }}>
-      <div style={{
-        background: 'rgba(255, 255, 255, 0.95)',
-        padding: '40px',
-        borderRadius: '20px',
-        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3), 0 8px 20px rgba(0, 0, 0, 0.2)',
-        width: '100%',
-        maxWidth: '400px',
-        position: 'relative',
-        zIndex: 1,
-        backdropFilter: 'blur(10px)',
-        border: '1px solid rgba(255, 255, 255, 0.2)'
-      }}>
-        <form onSubmit={handleSubmit}>
-          {/* Logo Section */}
-          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-            <div style={{
-              width: '80px',
-              height: '80px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 20px',
-              border: '3px solid #fbbf24',
-              boxShadow: '0 4px 15px rgba(251, 191, 36, 0.3)',
-              position: 'relative'
-            }}>
-              <Image
-                src="/aset/images (1).jpg"
-                alt="NEXMAX Logo"
-                width={50}
-                height={50}
-                style={{
-                  borderRadius: '50%',
-                  objectFit: 'cover'
-                }}
-              />
+                <div style={{
+         minHeight: '100vh',
+         display: 'flex',
+         alignItems: 'center',
+         justifyContent: 'center',
+                               background: `linear-gradient(135deg, #1e40af 0%, #3b82f6 25%, #60a5fa 50%, #3b82f6 75%, #1e40af 100%)`,
+       backgroundSize: 'cover',
+       backgroundPosition: 'center',
+       backgroundRepeat: 'no-repeat',
+       padding: '20px',
+       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+       position: 'relative'
+     }}>
+       <div style={{
+         position: 'absolute',
+         top: 0,
+         left: 0,
+         right: 0,
+         bottom: 0,
+         background: 'rgba(0, 0, 0, 0.4)',
+         zIndex: 0
+       }}></div>
+                                                       <div style={{
+           background: 'rgba(30, 41, 59, 0.95)',
+           backgroundImage: `url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.15"/><circle cx="20" cy="80" r="0.5" fill="white" opacity="0.15"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>')`,
+           padding: '32px',
+           borderRadius: '16px',
+           boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4), 0 8px 20px rgba(0, 0, 0, 0.3)',
+           width: '100%',
+           maxWidth: '360px',
+           position: 'relative',
+           zIndex: 2,
+           backdropFilter: 'blur(10px)',
+           border: '1px solid rgba(59, 130, 246, 0.3)'
+         }}>
+                 <form onSubmit={handleSubmit}>
+           {/* Logo Section */}
+                       <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+              <div style={{
+                width: '70px',
+                height: '70px',
+                borderRadius: '50%',
+                background: 'transparent',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px',
+                border: '3px solid #fbbf24',
+                boxShadow: '0 4px 15px rgba(251, 191, 36, 0.3)',
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                <Image
+                  src="/aset/images (1).jpg"
+                  alt="NEXMAX Logo"
+                  width={64}
+                  height={64}
+                  style={{
+                    borderRadius: '50%',
+                    objectFit: 'cover',
+                    width: '100%',
+                    height: '100%'
+                  }}
+                />
+              </div>
             </div>
-          </div>
-          
-          <h2 style={{
-            textAlign: 'center',
-            marginBottom: '8px',
-            color: '#0f766e',
-            fontWeight: '600',
-            fontSize: '24px'
-          }}>Welcome Back</h2>
-          
-          <p style={{
-            textAlign: 'center',
-            color: '#6b7280',
-            marginBottom: '30px',
-            fontSize: '14px'
-          }}>Sign in to your account</p>
-
-          {error && (
-            <div style={{
-              background: '#ef4444',
-              color: 'white',
-              padding: '12px',
-              borderRadius: '8px',
-              marginBottom: '20px',
+           
+                                               <p style={{
               textAlign: 'center',
-              fontSize: '14px'
-            }}>
-              {error}
-            </div>
-          )}
+              color: '#ffffff',
+              marginBottom: '24px',
+              fontSize: '15px',
+              fontWeight: '500'
+            }}>Sign in to your account</p>
 
-          <div style={{ marginBottom: '20px' }}>
-            <div style={{
-              position: 'relative',
-              display: 'flex',
-              alignItems: 'center'
-            }}>
-              <div style={{
-                position: 'absolute',
-                left: '12px',
-                color: '#0f766e',
-                fontSize: '18px'
-              }}>
-                👤
-              </div>
-              <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
-                required
-                autoComplete="off"
-                disabled={loading}
-                style={{
-                  width: '100%',
-                  padding: '16px 16px 16px 45px',
-                  border: '2px solid #e5e7eb',
-                  borderRadius: '12px',
-                  fontSize: '16px',
-                  transition: 'all 0.3s ease',
-                  boxSizing: 'border-box',
-                  background: 'rgba(255, 255, 255, 0.8)',
-                  outline: 'none'
-                }}
-              />
-            </div>
-          </div>
+           {error && (
+             <div style={{
+               background: '#ef4444',
+               color: 'white',
+               padding: '12px',
+               borderRadius: '8px',
+               marginBottom: '20px',
+               textAlign: 'center',
+               fontSize: '14px'
+             }}>
+               {error}
+             </div>
+           )}
 
-          <div style={{ marginBottom: '20px' }}>
-            <div style={{
-              position: 'relative',
-              display: 'flex',
-              alignItems: 'center'
-            }}>
-              <div style={{
-                position: 'absolute',
-                left: '12px',
-                color: '#0f766e',
-                fontSize: '18px'
-              }}>
-                🔒
-              </div>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                required
-                autoComplete="off"
-                disabled={loading}
-                style={{
-                  width: '100%',
-                  padding: '16px 16px 16px 45px',
-                  border: '2px solid #e5e7eb',
-                  borderRadius: '12px',
-                  fontSize: '16px',
-                  transition: 'all 0.3s ease',
-                  boxSizing: 'border-box',
-                  background: 'rgba(255, 255, 255, 0.8)',
-                  outline: 'none'
-                }}
-              />
-            </div>
-          </div>
+                     <div style={{ marginBottom: '16px' }}>
+             <div style={{
+               position: 'relative',
+               display: 'flex',
+               alignItems: 'center'
+             }}>
+                               <div style={{
+                  position: 'absolute',
+                  left: '12px',
+                  color: '#60a5fa',
+                  fontSize: '16px'
+                }}>
+                  👤
+                </div>
+               <input
+                 id="username"
+                 type="text"
+                 value={username}
+                 onChange={(e) => setUsername(e.target.value)}
+                 placeholder="Username"
+                 required
+                 autoComplete="off"
+                 disabled={loading}
+                 style={{
+                   width: '100%',
+                   padding: '16px 16px 16px 45px',
+                   border: '2px solid #374151',
+                   borderRadius: '12px',
+                   fontSize: '15px',
+                   transition: 'all 0.3s ease',
+                   boxSizing: 'border-box',
+                   background: 'rgba(51, 65, 85, 0.8)',
+                   outline: 'none',
+                   fontWeight: '500',
+                   color: '#ffffff'
+                 }}
+               />
+             </div>
+           </div>
 
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '25px'
-          }}>
-            <label style={{
-              display: 'flex',
-              alignItems: 'center',
-              color: '#0f766e',
-              fontSize: '14px',
-              cursor: 'pointer'
-            }}>
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                style={{
-                  marginRight: '8px',
-                  accentColor: '#0f766e'
-                }}
-              />
-              Remember me
-            </label>
-            <a href="#" style={{
-              color: '#0f766e',
-              fontSize: '14px',
-              textDecoration: 'none',
-              display: 'flex',
-              alignItems: 'center'
-            }}>
-              📧 Forget Password
-            </a>
-          </div>
+                     <div style={{ marginBottom: '16px' }}>
+             <div style={{
+               position: 'relative',
+               display: 'flex',
+               alignItems: 'center'
+             }}>
+                               <div style={{
+                  position: 'absolute',
+                  left: '12px',
+                  color: '#60a5fa',
+                  fontSize: '16px'
+                }}>
+                  🔒
+                </div>
+               <input
+                 id="password"
+                 type="password"
+                 value={password}
+                 onChange={(e) => setPassword(e.target.value)}
+                 placeholder="Password"
+                 required
+                 autoComplete="off"
+                 disabled={loading}
+                 style={{
+                   width: '100%',
+                   padding: '16px 16px 16px 45px',
+                   border: '2px solid #374151',
+                   borderRadius: '12px',
+                   fontSize: '15px',
+                   transition: 'all 0.3s ease',
+                   boxSizing: 'border-box',
+                   background: 'rgba(51, 65, 85, 0.8)',
+                   outline: 'none',
+                   fontWeight: '500',
+                   color: '#ffffff'
+                 }}
+               />
+             </div>
+           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: '100%',
-              padding: '16px',
-              background: 'linear-gradient(135deg, #0f766e, #134e4a)',
-              color: 'white',
-              border: 'none',
-              borderRadius: '12px',
-              fontSize: '16px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              textTransform: 'uppercase',
-              letterSpacing: '1px',
-              opacity: loading ? 0.6 : 1
-            }}
-          >
-            {loading ? 'Signing In...' : 'Login'}
-          </button>
+          
 
-          <div style={{
-            marginTop: '20px',
-            padding: '16px',
-            background: 'rgba(15, 118, 110, 0.1)',
-            borderRadius: '8px',
-            borderLeft: '4px solid #0f766e'
-          }}>
-            <p style={{
-              margin: '0 0 12px 0',
-              fontWeight: '600',
-              color: '#0f766e',
-              fontSize: '14px'
-            }}>
-              Demo Credentials:
-            </p>
-            <div style={{
-              marginBottom: '8px',
-              fontSize: '13px',
-              color: '#6b7280'
-            }}>
-              <strong style={{ color: '#0f766e' }}>Admin:</strong> admin / Admin123!
-            </div>
-            <div style={{
-              fontSize: '13px',
-              color: '#6b7280'
-            }}>
-              <strong style={{ color: '#0f766e' }}>Manager:</strong> manager / Manager2024!@#
-            </div>
-          </div>
+                     <button
+             type="submit"
+             disabled={loading}
+             style={{
+               width: '100%',
+               padding: '16px',
+               background: 'linear-gradient(135deg, #1e40af, #3b82f6)',
+               color: 'white',
+               border: 'none',
+               borderRadius: '12px',
+               fontSize: '15px',
+               fontWeight: '600',
+               cursor: 'pointer',
+               transition: 'all 0.3s ease',
+               textTransform: 'uppercase',
+               letterSpacing: '1px',
+               opacity: loading ? 0.6 : 1,
+               boxShadow: '0 8px 25px rgba(30, 64, 175, 0.3)',
+               position: 'relative',
+               overflow: 'hidden'
+             }}
+           >
+             {loading ? 'Signing In...' : 'Login'}
+           </button>
+
+          
         </form>
       </div>
 

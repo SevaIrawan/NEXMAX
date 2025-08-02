@@ -48,11 +48,9 @@ export default function Layout({
         onLogout={onLogout}
       />
       
-      {(subHeaderTitle || customSubHeader) && (
-        <div className={`subheader ${!sidebarOpen ? 'collapsed' : ''}`}>
-          {customSubHeader || <SubHeader title={subHeaderTitle || ''} />}
-        </div>
-      )}
+      <div className={`subheader ${!sidebarOpen ? 'collapsed' : ''}`}>
+        {customSubHeader || <SubHeader title={subHeaderTitle || ' '} />}
+      </div>
       
       <div className={`main-content ${!sidebarOpen ? 'collapsed' : ''}`}>
         {children}

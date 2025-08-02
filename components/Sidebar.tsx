@@ -35,6 +35,13 @@ export default function Sidebar({
     return () => clearInterval(interval)
   }, [])
 
+  // Auto show sub menu ketika user berada di halaman sub menu
+  useEffect(() => {
+    if (pathname.startsWith('/transaction/')) {
+      setOpenSubmenu('Transaction')
+    }
+  }, [pathname])
+
   const fetchLastUpdate = async () => {
     try {
       setIsLoading(true)
@@ -141,6 +148,11 @@ export default function Sidebar({
       icon: '🎯'
     },
     {
+      title: 'Business Flow',
+      path: '/business-flow',
+      icon: '🔄'
+    },
+    {
       title: 'BGO',
       path: '/bgo',
       icon: '📈'
@@ -159,11 +171,6 @@ export default function Sidebar({
       title: 'OS',
       path: '/os',
       icon: '🔧'
-    },
-    {
-      title: 'Business Flow',
-      path: '/business-flow',
-      icon: '🔄'
     },
     {
       title: 'Transaction',
@@ -193,12 +200,30 @@ export default function Sidebar({
 
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null)
 
-  const handleMenuClick = (path: string) => {
-    router.push(path)
+  const toggleSubmenu = (title: string) => {
+    // Jika user klik menu yang sama, toggle (buka/tutup) submenu
+    if (openSubmenu === title) {
+      // User ingin hide submenu
+      setOpenSubmenu(null)
+    } else {
+      // Jika user klik menu lain, buka submenu baru dan tutup yang lama
+      setOpenSubmenu(title)
+    }
   }
 
-  const toggleSubmenu = (title: string) => {
-    setOpenSubmenu(openSubmenu === title ? null : title)
+  const handleMenuClick = (path: string) => {
+    // Cek apakah path ini adalah sub menu dari Transaction
+    const isSubmenuPath = path.startsWith('/transaction/')
+    
+    if (isSubmenuPath) {
+      // Jika user klik sub menu, tetap buka sub menu Transaction
+      setOpenSubmenu('Transaction')
+    } else {
+      // Jika user klik menu lain (bukan sub menu), tutup sub menu
+      setOpenSubmenu(null)
+    }
+    
+    router.push(path)
   }
 
   return (
@@ -291,12 +316,12 @@ export default function Sidebar({
                 
                 {openSubmenu === item.title && sidebarOpen && (
                   <div style={{ 
-                    backgroundColor: '#000000', // BLACK background for submenu
+                    backgroundColor: '#1f2937', // DARK BLUE background for submenu (same as sidebar)
                     maxHeight: '200px', // Fixed height for submenu
                     overflowY: 'auto', // SCROLL ONLY FOR SUBMENU
                     overflowX: 'hidden',
                     scrollbarWidth: 'thin',
-                    scrollbarColor: '#4a5568 #000000' // Dark gray scrollbar
+                    scrollbarColor: '#4a5568 #1f2937' // Dark gray scrollbar on dark blue
                   }}
                   className="sidebar-submenu"
                 >
@@ -308,7 +333,7 @@ export default function Sidebar({
                           padding: '8px 20px 8px 52px',
                           cursor: 'pointer',
                           fontSize: '13px',
-                          backgroundColor: pathname === subItem.path ? '#333333' : 'transparent',
+                          backgroundColor: pathname === subItem.path ? '#374151' : 'transparent', // Darker blue for active submenu item
                           transition: 'background-color 0.2s ease',
                           color: '#ffffff',
                           display: 'flex',

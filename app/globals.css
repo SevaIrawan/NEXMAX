@@ -110,10 +110,19 @@ body {
   padding: 0 24px;
   transition: left 0.3s ease;
   overflow: hidden; /* NO SCROLL for subheader */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .subheader.collapsed {
   left: 80px;
+}
+
+.subheader h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  letter-spacing: -0.025em;
 }
 
 /* Main Content - AUTO FIT IN ONE FRAME */
