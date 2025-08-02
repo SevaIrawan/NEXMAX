@@ -69,7 +69,8 @@ export const USER_ROLES: { [key: string]: UserRole } = {
     name: 'usc_dep',
     displayName: 'USC Department',
     permissions: [
-      'usc'
+      'usc',
+      'dashboard'  // Allow access to dashboard as well to prevent redirect loops
     ],
     canAccessUserManagement: false,
     isReadOnly: true
@@ -102,8 +103,15 @@ export const getRoleInfo = (roleName: string): UserRole | null => {
 }
 
 export const hasPermission = (userRole: string, pagePath: string): boolean => {
+  console.log('🔍 hasPermission called with:', { userRole, pagePath })
+  
   const role = getRoleInfo(userRole)
-  if (!role) return false
+  console.log('👤 Role info:', role)
+  
+  if (!role) {
+    console.log('❌ No role found')
+    return false
+  }
 
   // Map page paths to permission names
   const pathToPermission: { [key: string]: string } = {
@@ -131,7 +139,13 @@ export const hasPermission = (userRole: string, pagePath: string): boolean => {
   }
 
   const permission = pathToPermission[pagePath]
-  return permission ? role.permissions.includes(permission) : false
+  console.log('🎯 Required permission:', permission)
+  console.log('📋 User permissions:', role.permissions)
+  
+  const hasAccess = permission ? role.permissions.includes(permission) : false
+  console.log('✅ Has access:', hasAccess)
+  
+  return hasAccess
 }
 
 export const canAccessUserManagement = (userRole: string): boolean => {

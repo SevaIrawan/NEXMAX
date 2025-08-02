@@ -26,8 +26,12 @@ export default function LoginPage() {
         const user = localStorage.getItem('nexmax_session')
         if (user) {
           try {
-            JSON.parse(user) // Validate JSON
-            router.push('/dashboard')
+            const userData = JSON.parse(user) // Validate JSON
+            if (userData.role === 'usc_dep') {
+              router.push('/usc/overview')
+            } else {
+              router.push('/dashboard')
+            }
           } catch (error) {
             console.error('Invalid session data:', error)
             localStorage.removeItem('nexmax_session')
@@ -71,9 +75,13 @@ export default function LoginPage() {
         email: users.email
       }))
 
-      // Redirect to dashboard
+      // Redirect based on user role
       setTimeout(() => {
-        router.push('/dashboard')
+        if (users.role === 'usc_dep') {
+          router.push('/usc/overview')
+        } else {
+          router.push('/dashboard')
+        }
       }, 100)
 
     } catch (err) {

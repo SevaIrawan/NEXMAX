@@ -24,6 +24,8 @@ export default function AccessControl({ children }: AccessControlProps) {
         
         // Get user session
         const session = localStorage.getItem('nexmax_session')
+        console.log('🗂️ Session data:', session ? 'exists' : 'not found')
+        
         if (!session) {
           console.log('❌ No session found, redirecting to login')
           router.push('/login')
@@ -34,6 +36,7 @@ export default function AccessControl({ children }: AccessControlProps) {
         const userRole = sessionData.role || 'user'
         console.log('👤 User role:', userRole)
         console.log('📍 Current path:', pathname)
+        console.log('📋 Session data:', sessionData)
 
         // Check if user has permission for current page
         const hasAccess = hasPermission(userRole, pathname)
@@ -41,6 +44,16 @@ export default function AccessControl({ children }: AccessControlProps) {
         
         if (!hasAccess) {
           console.log(`❌ Access denied for role ${userRole} to ${pathname}`)
+          
+          // Special handling for usc_dep role - redirect to USC Overview
+          if (userRole === 'usc_dep') {
+            console.log('🔄 Redirecting usc_dep to USC Overview')
+            // Force redirect with window.location to avoid any routing issues
+            window.location.href = '/usc/overview'
+            return
+          }
+          
+          // Default redirect to dashboard for other roles
           router.push('/dashboard')
           return
         }
@@ -50,6 +63,7 @@ export default function AccessControl({ children }: AccessControlProps) {
         setIsLoading(false)
       } catch (error) {
         console.error('❌ Error checking access:', error)
+        console.error('Error details:', error)
         router.push('/login')
       }
     }
