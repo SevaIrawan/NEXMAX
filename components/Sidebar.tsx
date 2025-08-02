@@ -296,6 +296,9 @@ export default function Sidebar({
   }
 
   const handleMenuClick = (path: string) => {
+    // Skip navigation if already on the same path
+    if (pathname === path) return
+    
     // Cek apakah path ini adalah sub menu dari menu manapun
     const parentMenu = getParentMenuFromPath(path)
     
@@ -307,8 +310,24 @@ export default function Sidebar({
       setOpenSubmenu(null)
     }
     
+    // Optimized navigation with smooth transition
     router.push(path)
   }
+
+  // Preload function untuk pages yang sering diakses
+  const preloadPage = (path: string) => {
+    if (typeof window !== 'undefined') {
+      router.prefetch(path)
+    }
+  }
+
+  // Preload common pages on mount
+  useEffect(() => {
+    const commonPaths = ['/dashboard', '/business-flow', '/strategic-executive', '/usc/overview']
+    commonPaths.forEach(path => {
+      setTimeout(() => preloadPage(path), 100)
+    })
+  }, [])
 
   return (
          <div 

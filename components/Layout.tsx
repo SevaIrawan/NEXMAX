@@ -5,6 +5,8 @@ import Header from './Header'
 import Sidebar from './Sidebar'
 import SubHeader from './SubHeader'
 import AccessControl from './AccessControl'
+import PageTransition from './PageTransition'
+import NavPrefetch from './NavPrefetch'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -32,6 +34,8 @@ export default function Layout({
   return (
     <AccessControl>
       <div className="main-container">
+        <NavPrefetch />
+        
         <Sidebar 
           sidebarOpen={sidebarOpen} 
           setSidebarOpen={setSidebarOpen}
@@ -55,7 +59,9 @@ export default function Layout({
         </div>
         
         <div className={`main-content ${!sidebarOpen ? 'collapsed' : ''}`}>
-          {children}
+          <PageTransition>
+            {children}
+          </PageTransition>
         </div>
       </div>
     </AccessControl>

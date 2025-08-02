@@ -19,6 +19,29 @@ body {
   overflow: hidden; /* Prevent body scroll */
 }
 
+/* PERFORMANCE OPTIMIZATION - Smooth transitions */
+* {
+  will-change: auto;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Smooth page transitions */
+.page-transition {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Layout utama */
 .main-container {
   display: flex;
@@ -214,7 +237,7 @@ body {
 .progress-in-progress { background-color: #ffc107; }
 .progress-pending { background-color: #6c757d; }
 
-/* Sidebar */
+/* Sidebar - OPTIMIZED FOR SMOOTH PERFORMANCE */
 .sidebar {
   position: fixed;
   left: 0;
@@ -227,7 +250,11 @@ body {
   overflow: hidden; /* NO SCROLL for sidebar */
   display: flex;
   flex-direction: column;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Smoother easing */
+  /* Performance optimizations */
+  transform: translateZ(0); /* Hardware acceleration */
+  will-change: width, transform;
+  contain: layout style paint;
 }
 
 .sidebar.collapsed {
@@ -348,7 +375,7 @@ body {
   border-color: #d1d5db;
 }
 
-/* Main Content - AUTO FIT IN ONE FRAME */
+/* Main Content - AUTO FIT IN ONE FRAME - OPTIMIZED FOR SMOOTH TRANSITIONS */
 .main-content {
   position: fixed;
   top: 90px; /* Header height */
@@ -356,9 +383,13 @@ body {
   right: 0;
   bottom: 0;
   background-color: #f8f9fa;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Smoother easing */
   overflow: auto; /* Scroll only for main content */
   width: calc(100vw - 280px);
+  /* Performance optimizations */
+  transform: translateZ(0); /* Hardware acceleration */
+  will-change: transform, left, width;
+  contain: layout style paint;
 }
 
 .main-content.collapsed {
