@@ -20,7 +20,8 @@ interface LogEntry {
 export default function ConnectionTest() {
   const [connectionStatus, setConnectionStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [tables, setTables] = useState<TableInfo[]>([])
-  const [lastUpdate, setLastUpdate] = useState<string>('')
+  const [lastUpdate, setLastUpdate] = useState<string>('Loading...')
+  const [isLoading, setIsLoading] = useState<boolean>(true)
   const [loading, setLoading] = useState(true)
   const [logs, setLogs] = useState<LogEntry[]>([])
   const [lastDataHash, setLastDataHash] = useState<string>('')
@@ -47,11 +48,106 @@ export default function ConnectionTest() {
     addLog('🔗 Testing Supabase connection...', 'info')
     addLog('📡 URL: https://bbuxfnchflhtulainndm.supabase.co', 'info')
     addLog('🔑 Key: Configured', 'info')
+    fetchLastUpdate()
     testConnection()
     // Auto check untuk perubahan database setiap 30 detik
     const interval = setInterval(checkForChanges, 30000)
-    return () => clearInterval(interval)
+    const lastUpdateInterval = setInterval(fetchLastUpdate, 30000)
+    return () => {
+      clearInterval(interval)
+      clearInterval(lastUpdateInterval)
+    }
   }, [])
+
+  // Fetch Last Update dengan logic yang sama seperti sidebar
+  const fetchLastUpdate = async () => {
+    try {
+      setIsLoading(true)
+      console.log('🔧 Supabase Page - Fetching MAX(date) from member_report_monthly...')
+      
+      // Mengambil MAX(date) dari kolom member_report_monthly
+      const { data, error } = await supabase
+        .from('member_report_monthly')
+        .select('date')
+        .order('date', { ascending: false })
+        .limit(1)
+      
+      if (error) {
+        console.error('❌ Supabase Page - Error fetching MAX(date):', error)
+        setLastUpdate('Error')
+        setIsLoading(false)
+        return
+      }
+
+      if (data && data.length > 0) {
+        const maxDate = data[0].date
+        console.log('📅 Raw MAX(date) from database:', maxDate)
+        
+        // Handle different date formats
+        let date: Date | null = null
+        
+        if (typeof maxDate === 'string') {
+          // Try different date formats
+          const formats = [
+            // yyyy-mm-dd (ISO format)
+            /^(\d{4})-(\d{1,2})-(\d{1,2})$/, 
+            // yyyy/mm/dd
+            /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/, 
+            // dd/mm/yyyy
+            /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/, 
+            // mm/dd/yyyy
+            /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
+          ]
+          
+          for (const format of formats) {
+            const match = maxDate.match(format)
+            if (match) {
+              const [, first, second, third] = match
+              
+              // Determine format based on first number
+              if (parseInt(first) > 31) {
+                // yyyy-mm-dd or yyyy/mm/dd
+                date = new Date(parseInt(first), parseInt(second) - 1, parseInt(third))
+              } else if (parseInt(third) > 31) {
+                // dd/mm/yyyy or mm/dd/yyyy - assume dd/mm/yyyy
+                date = new Date(parseInt(third), parseInt(second) - 1, parseInt(first))
+              }
+              
+              if (date && !isNaN(date.getTime())) {
+                break
+              }
+            }
+          }
+        } else if (maxDate instanceof Date) {
+          date = maxDate
+        }
+        
+        if (date && !isNaN(date.getTime())) {
+          const formattedDate = date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          })
+          
+          setLastUpdate(formattedDate)
+          setIsLoading(false)
+          console.log('✅ Supabase Page - MAX(date) updated:', formattedDate)
+        } else {
+          console.error('❌ Supabase Page - Invalid date format:', maxDate)
+          setLastUpdate('Invalid Date')
+          setIsLoading(false)
+        }
+      } else {
+        console.log('⚠️ Supabase Page - No data found in member_report_monthly')
+        setLastUpdate('No Data')
+        setIsLoading(false)
+      }
+    } catch (error) {
+      console.error('❌ Supabase Page - Exception fetching MAX(date):', error)
+      setLastUpdate('Error')
+      setIsLoading(false)
+    }
+  }
 
   const addLog = (message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info') => {
     const timestamp = new Date().toLocaleString('en-US', {
@@ -173,41 +269,6 @@ export default function ConnectionTest() {
         }
       }
 
-      // Get MAX(date) dari master table member_report_monthly - FIXED QUERY
-      try {
-        const { data: dateData, error: dateError } = await supabase
-          .from('member_report_monthly')
-          .select('date')
-          .order('date', { ascending: false })
-          .limit(1)
-
-        if (!dateError && dateData && dateData.length > 0) {
-          const maxDate = dateData[0].date
-          console.log('📅 Raw MAX(date) from master table:', maxDate)
-          addLog(`📅 Raw MAX(date) from master table: ${maxDate}`, 'info')
-          
-          // Parse date format MM/DD/YYYY
-          const dateParts = maxDate.split('/')
-          const month = parseInt(dateParts[0])
-          const day = parseInt(dateParts[1])
-          const year = parseInt(dateParts[2])
-          
-          const date = new Date(year, month - 1, day)
-          const formattedDate = date.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric'
-          })
-          
-          setLastUpdate(formattedDate)
-          console.log('✅ MAX(date) from master table:', formattedDate)
-          addLog(`✅ MAX(date) from master table: ${formattedDate}`, 'success')
-          addLog('📊 Master table member_report_monthly is the reference for LAST UPDATE', 'info')
-        }
-      } catch (dateErr) {
-        console.error('❌ Error getting last update date:', dateErr)
-        addLog('❌ Error getting last update date', 'error')
-      }
-
     } catch (error) {
       console.error('❌ Connection test failed:', error)
       addLog(`❌ Connection test failed: ${error}`, 'error')
@@ -265,45 +326,10 @@ export default function ConnectionTest() {
     return '📋'
   }
 
-  // Custom SubHeader component untuk Connection dan Last Update
-  const ConnectionSubHeader = () => (
-    <div style={{ 
-      display: 'flex', 
-      alignItems: 'flex-start', 
-      justifyContent: 'flex-start',
-      width: '100%',
-      padding: '0 24px',
-      flexDirection: 'column',
-      gap: '8px'
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div style={{
-          width: '12px',
-          height: '12px',
-          borderRadius: '50%',
-          backgroundColor: getStatusColor(connectionStatus)
-        }} />
-        <span style={{ fontSize: '16px', fontWeight: '500', color: '#1f2937' }}>
-          {getStatusText(connectionStatus)}
-        </span>
-      </div>
-      
-      {lastUpdate && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '0px' }}>
-          <span style={{ fontSize: '14px', color: '#6b7280' }}>Last Update: </span>
-          <span style={{ fontSize: '14px', fontWeight: '600', color: '#10b981' }}>
-            {lastUpdate}
-          </span>
-        </div>
-      )}
-    </div>
-  )
-
   return (
     <Layout
       pageTitle="Supabase"
       subHeaderTitle=""
-      customSubHeader={<ConnectionSubHeader />}
     >
       <div style={{ 
         padding: '16px',
@@ -329,9 +355,47 @@ export default function ConnectionTest() {
             overflow: 'auto',
             height: '100%'
           }}>
-            <h2 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '16px', color: '#1f2937' }}>
-              Database Tables - Supabase
-            </h2>
+            {/* Header dengan Last Update di kanan atas */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '16px'
+            }}>
+              <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1f2937', margin: 0 }}>
+                Database Tables - Supabase
+              </h2>
+              
+              {/* Last Update di kanan atas */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '6px 12px',
+                backgroundColor: '#f8f9fa',
+                borderRadius: '6px',
+                border: '1px solid #e5e7eb'
+              }}>
+                <span style={{ fontSize: '12px', color: '#6b7280' }}>Update: </span>
+                {isLoading ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <div style={{
+                      width: '8px',
+                      height: '8px',
+                      border: '1px solid #10b981',
+                      borderTop: '1px solid transparent',
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite'
+                    }}></div>
+                    <span style={{ color: '#6b7280', fontSize: '12px' }}>Loading...</span>
+                  </div>
+                ) : (
+                  <span style={{ fontSize: '12px', fontWeight: '600', color: '#10b981' }}>
+                    {lastUpdate}
+                  </span>
+                )}
+              </div>
+            </div>
 
             {loading ? (
               <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
@@ -442,9 +506,38 @@ export default function ConnectionTest() {
             overflow: 'auto',
             height: '100%'
           }}>
-            <h2 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '16px', color: '#1f2937' }}>
-              Real Time Logs Chart
-            </h2>
+            {/* Header dengan Connected status di kanan atas */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '16px'
+            }}>
+              <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1f2937', margin: 0 }}>
+                Real Time Logs Chart
+              </h2>
+              
+              {/* Connected status di kanan atas */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '6px 12px',
+                backgroundColor: '#f8f9fa',
+                borderRadius: '6px',
+                border: '1px solid #e5e7eb'
+              }}>
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  backgroundColor: getStatusColor(connectionStatus)
+                }} />
+                <span style={{ fontSize: '12px', fontWeight: '600', color: '#1f2937' }}>
+                  {getStatusText(connectionStatus)}
+                </span>
+              </div>
+            </div>
 
             <div style={{
               backgroundColor: '#1f2937',
@@ -489,6 +582,13 @@ export default function ConnectionTest() {
           </div>
         </div>
       </div>
+      
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </Layout>
   )
 } 

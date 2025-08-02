@@ -4,11 +4,13 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Layout from '@/components/Layout'
 import SubHeader from '@/components/SubHeader'
+import { validateSession, cleanupSession } from '@/utils/sessionCleanup'
 
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null)
   const [darkMode, setDarkMode] = useState(false)
   const [sidebarExpanded, setSidebarExpanded] = useState(true)
+  const [loading, setLoading] = useState(true)
   const router = useRouter()
 
   const [year, setYear] = useState(2025)
@@ -16,14 +18,13 @@ export default function DashboardPage() {
   const [month, setMonth] = useState(1)
 
   useEffect(() => {
-    // Check authentication
-    const session = localStorage.getItem('nexmax_session')
-    if (!session) {
+    // Check authentication using utility function
+    const sessionData = validateSession()
+    if (!sessionData) {
       router.push('/login')
       return
     }
 
-    const sessionData = JSON.parse(session)
     setUser(sessionData)
     
     // Check dark mode preference
@@ -32,17 +33,12 @@ export default function DashboardPage() {
     if (isDark) {
       document.documentElement.classList.add('dark')
     }
-  }, [router])
+    
+    setLoading(false)
+  }, []) // Remove router from dependency to prevent re-runs
 
   const handleLogout = () => {
-    try {
-      localStorage.removeItem('nexmax_session')
-      document.cookie = 'user_id=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT'
-      document.cookie = 'username=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT'
-      document.cookie = 'user_role=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT'
-    } catch (error) {
-      console.error('Logout error:', error)
-    }
+    cleanupSession()
     router.push('/login')
   }
 
@@ -57,6 +53,52 @@ export default function DashboardPage() {
     }
   }
 
+  if (loading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        background: 'linear-gradient(135deg, #1a1d29 0%, #2d3142 50%, #1a1d29 100%)',
+        color: 'white',
+        fontFamily: 'Arial, sans-serif'
+      }}>
+        <div style={{
+          textAlign: 'center',
+          padding: '2rem'
+        }}>
+          <div style={{
+            fontSize: '3rem',
+            marginBottom: '1rem',
+            animation: 'pulse 2s infinite'
+          }}>
+            ⚡
+          </div>
+          <h1 style={{
+            fontSize: '2rem',
+            marginBottom: '1rem',
+            color: '#ffd700'
+          }}>
+            NEXMAX Dashboard
+          </h1>
+          <p style={{
+            fontSize: '1.1rem',
+            opacity: 0.8
+          }}>
+            Loading...
+          </p>
+        </div>
+        <style jsx>{`
+          @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+          }
+        `}</style>
+      </div>
+    )
+  }
+
   if (!user) {
     return null
   }
@@ -64,21 +106,21 @@ export default function DashboardPage() {
   return (
     <Layout
       pageTitle="Dashboard"
-      subHeaderTitle="Dashboard"
+      subHeaderTitle=""
     >
-      <SubHeader title="" />
-      
-      <div className="text-center" style={{ marginTop: '50px' }}>
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          🚧 Coming Soon
-        </h1>
-        <p className="text-xl text-gray-600 mb-8">
-          Main Dashboard sedang dalam pengembangan
-        </p>
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-md mx-auto">
-          <p className="text-blue-800">
-            Fitur ini akan segera hadir.
+      <div className="kpi-grid">
+        <div className="text-center" style={{ marginTop: '50px' }}>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            🚧 Coming Soon
+          </h1>
+          <p className="text-xl text-gray-600 mb-8">
+            Main Dashboard sedang dalam pengembangan
           </p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-md mx-auto">
+            <p className="text-blue-800">
+              Fitur ini akan segera hadir.
+            </p>
+          </div>
         </div>
       </div>
     </Layout>

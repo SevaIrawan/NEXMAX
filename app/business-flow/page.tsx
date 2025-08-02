@@ -286,15 +286,12 @@ export default function BusinessFlow() {
   return (
     <Layout
       pageTitle="Business Flow"
-      subHeaderTitle="Business Flow"
+      subHeaderTitle=""
       darkMode={darkMode}
       sidebarExpanded={sidebarExpanded}
       onToggleDarkMode={() => setDarkMode(!darkMode)}
       onLogout={handleLogout}
     >
-      {/* SUB HEADER - EMPTY FOR NOW */}
-      <SubHeader title="" />
-      
       {/* CONTENT - BUSINESS FLOW MODULES */}
       <div style={{
         padding: '40px',

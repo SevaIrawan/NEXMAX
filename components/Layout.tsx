@@ -39,25 +39,23 @@ export default function Layout({
         sidebarExpanded={sidebarExpanded}
       />
       
-      <div style={{ flex: 1, marginLeft: sidebarOpen ? '0px' : '0px' }}>
-        <Header 
-          pageTitle={pageTitle}
-          sidebarOpen={sidebarOpen}
-          setSidebarOpen={setSidebarOpen}
-          darkMode={darkMode}
-          onToggleDarkMode={onToggleDarkMode}
-          onLogout={onLogout}
-        />
-        
-        {(subHeaderTitle || customSubHeader) && (
-          <div className={`subheader ${!sidebarOpen ? 'collapsed' : ''}`}>
-            {customSubHeader || <SubHeader title={subHeaderTitle || ''} />}
-          </div>
-        )}
-        
-        <div className={`main-content ${!sidebarOpen ? 'collapsed' : ''}`}>
-          {children}
+      <Header 
+        pageTitle={pageTitle}
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        darkMode={darkMode}
+        onToggleDarkMode={onToggleDarkMode}
+        onLogout={onLogout}
+      />
+      
+      {(subHeaderTitle || customSubHeader) && (
+        <div className={`subheader ${!sidebarOpen ? 'collapsed' : ''}`}>
+          {customSubHeader || <SubHeader title={subHeaderTitle || ''} />}
         </div>
+      )}
+      
+      <div className={`main-content ${!sidebarOpen ? 'collapsed' : ''}`}>
+        {children}
       </div>
     </div>
   )

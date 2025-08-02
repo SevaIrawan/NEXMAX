@@ -26,19 +26,21 @@ export default function Sidebar({
   const pathname = usePathname()
   const [lastUpdate, setLastUpdate] = useState<string>('Loading...')
   const [isConnected, setIsConnected] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
 
   useEffect(() => {
     fetchLastUpdate()
-    // Auto refresh setiap 60 detik
-    const interval = setInterval(fetchLastUpdate, 60000)
+    // Auto refresh setiap 30 detik
+    const interval = setInterval(fetchLastUpdate, 30000)
     return () => clearInterval(interval)
   }, [])
 
   const fetchLastUpdate = async () => {
     try {
-      console.log('�� Sidebar - Fetching MAX(date) from master table member_report_monthly...')
+      setIsLoading(true)
+      console.log('🔧 Sidebar - Fetching MAX(date) from member_report_monthly...')
       
-      // Mengambil MAX(date) dari kolom master member_report_monthly
+      // Mengambil MAX(date) dari kolom member_report_monthly
       const { data, error } = await supabase
         .from('member_report_monthly')
         .select('date')
@@ -48,35 +50,82 @@ export default function Sidebar({
       if (error) {
         console.error('❌ Sidebar - Error fetching MAX(date):', error)
         setIsConnected(false)
+        setLastUpdate('Error')
+        setIsLoading(false)
         return
       }
 
       if (data && data.length > 0) {
         const maxDate = data[0].date
-        console.log('📅 Raw MAX(date) from master table:', maxDate)
+        console.log('📅 Raw MAX(date) from database:', maxDate)
         
-        const dateParts = maxDate.split('/')
-        const month = parseInt(dateParts[0])
-        const day = parseInt(dateParts[1])
-        const year = parseInt(dateParts[2])
+        // Handle different date formats
+        let date: Date | null = null
         
-        const date = new Date(year, month - 1, day)
-        const formattedDate = date.toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric'
-        })
+        if (typeof maxDate === 'string') {
+          // Try different date formats
+          const formats = [
+            // yyyy-mm-dd (ISO format)
+            /^(\d{4})-(\d{1,2})-(\d{1,2})$/, 
+            // yyyy/mm/dd
+            /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/, 
+            // dd/mm/yyyy
+            /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/, 
+            // mm/dd/yyyy
+            /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
+          ]
+          
+          for (const format of formats) {
+            const match = maxDate.match(format)
+            if (match) {
+              const [, first, second, third] = match
+              
+              // Determine format based on first number
+              if (parseInt(first) > 31) {
+                // yyyy-mm-dd or yyyy/mm/dd
+                date = new Date(parseInt(first), parseInt(second) - 1, parseInt(third))
+              } else if (parseInt(third) > 31) {
+                // dd/mm/yyyy or mm/dd/yyyy - assume dd/mm/yyyy
+                date = new Date(parseInt(third), parseInt(second) - 1, parseInt(first))
+              }
+              
+              if (date && !isNaN(date.getTime())) {
+                break
+              }
+            }
+          }
+        } else if (maxDate instanceof Date) {
+          date = maxDate
+        }
         
-        setLastUpdate(formattedDate)
-        setIsConnected(true)
-        console.log('✅ Sidebar - MAX(date) updated from master table:', formattedDate)
-        console.log('📊 Master table member_report_monthly is the reference for LAST UPDATE')
+        if (date && !isNaN(date.getTime())) {
+          const formattedDate = date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          })
+          
+          setLastUpdate(formattedDate)
+          setIsConnected(true)
+          setIsLoading(false)
+          console.log('✅ Sidebar - MAX(date) updated:', formattedDate)
+        } else {
+          console.error('❌ Sidebar - Invalid date format:', maxDate)
+          setLastUpdate('Invalid Date')
+          setIsConnected(false)
+          setIsLoading(false)
+        }
       } else {
-        console.log('⚠️ Sidebar - No data found in master table')
+        console.log('⚠️ Sidebar - No data found in member_report_monthly')
+        setLastUpdate('No Data')
         setIsConnected(false)
+        setIsLoading(false)
       }
     } catch (error) {
       console.error('❌ Sidebar - Exception fetching MAX(date):', error)
+      setLastUpdate('Error')
       setIsConnected(false)
+      setIsLoading(false)
     }
   }
 
@@ -146,7 +195,6 @@ export default function Sidebar({
 
   const handleMenuClick = (path: string) => {
     router.push(path)
-    setSidebarOpen(false)
   }
 
   const toggleSubmenu = (title: string) => {
@@ -155,39 +203,44 @@ export default function Sidebar({
 
   return (
     <div 
-      style={{
-        position: 'fixed',
-        left: 0,
-        top: 0,
-        height: '100vh',
-        width: sidebarOpen ? '250px' : '80px',
-        backgroundColor: '#1f2937',
-        color: 'white',
-        transition: 'width 0.3s ease',
-        zIndex: 1000,
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column'
-      }}
+      className={`sidebar ${!sidebarOpen ? 'collapsed' : ''}`}
+      style={{ backgroundColor: '#1f2937' }} // Dark blue background
     >
-      {/* Logo Section */}
+      {/* Logo Section with Circular Gold Border */}
       <div style={{
         padding: '20px',
-        borderBottom: '1px solid #374151',
+        borderBottom: '1px solid #374151', // Darker border for dark blue
         display: 'flex',
         alignItems: 'center',
         justifyContent: sidebarOpen ? 'flex-start' : 'center',
-        minHeight: '80px'
+        minHeight: '80px',
+        flexShrink: 0, // Prevent logo section from shrinking
+        backgroundColor: '#1f2937' // Dark blue background
       }}>
-        {sidebarOpen ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{
+            width: '50px',
+            height: '50px',
+            borderRadius: '50%',
+            border: '3px solid #FFD700',
+            padding: '3px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#1f2937' // Dark blue background
+          }}>
             <Image
               src="/aset/images (1).jpg"
               alt="NEXMAX Logo"
-              width={40}
-              height={40}
-              style={{ borderRadius: '8px' }}
+              width={44}
+              height={44}
+              style={{ 
+                borderRadius: '50%',
+                objectFit: 'cover'
+              }}
             />
+          </div>
+          {sidebarOpen && (
             <span style={{ 
               fontSize: '18px', 
               fontWeight: '600',
@@ -195,23 +248,16 @@ export default function Sidebar({
             }}>
               NEXMAX
             </span>
-          </div>
-        ) : (
-          <Image
-            src="/aset/images (1).jpg"
-            alt="NEXMAX Logo"
-            width={40}
-            height={40}
-            style={{ borderRadius: '8px' }}
-          />
-        )}
+          )}
+        </div>
       </div>
 
-      {/* Menu Items */}
-      <div style={{ 
-        flex: 1, 
-        overflowY: 'auto',
-        padding: '16px 0'
+      {/* Menu Items - NO SCROLL */}
+      <div style={{
+        flex: 1,
+        overflow: 'hidden', // NO SCROLL for main menu
+        padding: '16px 0',
+        backgroundColor: '#1f2937' // Dark blue background
       }}>
         {menuItems.map((item, index) => (
           <div key={index}>
@@ -225,25 +271,35 @@ export default function Sidebar({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: sidebarOpen ? 'space-between' : 'center',
-                    backgroundColor: openSubmenu === item.title ? '#374151' : 'transparent',
-                    transition: 'background-color 0.2s ease'
+                    backgroundColor: openSubmenu === item.title ? '#374151' : 'transparent', // Darker blue for active
+                    transition: 'background-color 0.2s ease',
+                    color: '#ffffff'
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <span style={{ fontSize: '16px' }}>{item.icon}</span>
                     {sidebarOpen && (
-                      <span style={{ fontSize: '14px' }}>{item.title}</span>
+                      <span style={{ fontSize: '14px', color: '#ffffff' }}>{item.title}</span>
                     )}
                   </div>
                   {sidebarOpen && (
-                    <span style={{ fontSize: '12px' }}>
+                    <span style={{ fontSize: '12px', color: '#ffffff' }}>
                       {openSubmenu === item.title ? '▼' : '▶'}
                     </span>
                   )}
                 </div>
                 
                 {openSubmenu === item.title && sidebarOpen && (
-                  <div style={{ backgroundColor: '#111827' }}>
+                  <div style={{ 
+                    backgroundColor: '#000000', // BLACK background for submenu
+                    maxHeight: '200px', // Fixed height for submenu
+                    overflowY: 'auto', // SCROLL ONLY FOR SUBMENU
+                    overflowX: 'hidden',
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: '#4a5568 #000000' // Dark gray scrollbar
+                  }}
+                  className="sidebar-submenu"
+                >
                     {item.submenu.map((subItem, subIndex) => (
                       <div
                         key={subIndex}
@@ -252,11 +308,23 @@ export default function Sidebar({
                           padding: '8px 20px 8px 52px',
                           cursor: 'pointer',
                           fontSize: '13px',
-                          backgroundColor: pathname === subItem.path ? '#374151' : 'transparent',
-                          transition: 'background-color 0.2s ease'
+                          backgroundColor: pathname === subItem.path ? '#333333' : 'transparent',
+                          transition: 'background-color 0.2s ease',
+                          color: '#ffffff',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
                         }}
                       >
-                        {subItem.title}
+                        {/* White Bullet Point */}
+                        <span style={{
+                          width: '4px',
+                          height: '4px',
+                          backgroundColor: '#ffffff',
+                          borderRadius: '50%',
+                          flexShrink: 0
+                        }}></span>
+                        <span>{subItem.title}</span>
                       </div>
                     ))}
                   </div>
@@ -271,13 +339,14 @@ export default function Sidebar({
                   display: 'flex',
                   alignItems: 'center',
                   gap: '12px',
-                  backgroundColor: pathname === item.path ? '#374151' : 'transparent',
-                  transition: 'background-color 0.2s ease'
+                  backgroundColor: pathname === item.path ? '#374151' : 'transparent', // Darker blue for active
+                  transition: 'background-color 0.2s ease',
+                  color: '#ffffff'
                 }}
               >
                 <span style={{ fontSize: '16px' }}>{item.icon}</span>
                 {sidebarOpen && (
-                  <span style={{ fontSize: '14px' }}>{item.title}</span>
+                  <span style={{ fontSize: '14px', color: '#ffffff' }}>{item.title}</span>
                 )}
               </div>
             )}
@@ -285,52 +354,95 @@ export default function Sidebar({
         ))}
       </div>
 
-      {/* LAST UPDATE Section */}
+      {/* LAST UPDATE Section with Enhanced Loading Animation */}
       <div style={{
         padding: '20px',
-        borderTop: '1px solid #374151',
-        backgroundColor: '#111827'
+        borderTop: '1px solid #374151', // Darker border for dark blue
+        backgroundColor: '#1f2937', // DARK BLUE background for update section
+        flexShrink: 0 // Prevent last update section from shrinking
       }}>
         {sidebarOpen ? (
           <div style={{ textAlign: 'center' }}>
             <div style={{
-              fontSize: '12px',
-              color: '#9ca3af',
-              marginBottom: '8px',
-              fontWeight: '500'
-            }}>
-              LAST UPDATE
-            </div>
-            <div style={{
-              fontSize: '16px',
+              fontSize: '14px',
               fontWeight: '600',
-              color: isConnected ? '#10b981' : '#ef4444',
+              color: '#ffffff',
               padding: '8px 12px',
-              backgroundColor: isConnected ? '#065f46' : '#7f1d1d',
+              backgroundColor: '#1f2937', // DARK BLUE background
               borderRadius: '8px',
-              border: `2px solid ${isConnected ? '#10b981' : '#ef4444'}`
+              border: `2px solid #FFD700`,
+              marginBottom: '4px',
+              position: 'relative',
+              overflow: 'hidden',
+              minHeight: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}>
-              {lastUpdate}
-            </div>
-            <div style={{
-              fontSize: '10px',
-              color: '#6b7280',
-              marginTop: '4px'
-            }}>
-              {isConnected ? 'Connected' : 'Disconnected'}
+              {isLoading ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{
+                    width: '16px',
+                    height: '16px',
+                    border: '2px solid #FFD700',
+                    borderTop: '2px solid transparent',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                  }}></div>
+                  <span style={{ color: '#ffffff', fontSize: '12px' }}>Loading Update...</span>
+                </div>
+              ) : (
+                <>
+                  <span style={{ color: '#ffffff' }}>Update: </span>
+                  <span style={{ color: '#ffffff' }}>{lastUpdate}</span>
+                </>
+              )}
             </div>
           </div>
         ) : (
           <div style={{ textAlign: 'center' }}>
             <div style={{
-              fontSize: '12px',
-              color: isConnected ? '#10b981' : '#ef4444',
-              fontWeight: '600'
+              fontSize: '10px',
+              color: '#ffffff',
+              fontWeight: '600',
+              padding: '4px 8px',
+              backgroundColor: '#1f2937', // DARK BLUE background
+              borderRadius: '4px',
+              border: `1px solid #FFD700`,
+              position: 'relative',
+              overflow: 'hidden',
+              minHeight: '24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}>
-              {lastUpdate}
+              {isLoading ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <div style={{
+                    width: '8px',
+                    height: '8px',
+                    border: '1px solid #FFD700',
+                    borderTop: '1px solid transparent',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                  }}></div>
+                  <span style={{ color: '#ffffff', fontSize: '8px' }}>Loading...</span>
+                </div>
+              ) : (
+                <>
+                  <span style={{ color: '#ffffff' }}>Update: </span>
+                  <span style={{ color: '#ffffff' }}>{lastUpdate}</span>
+                </>
+              )}
             </div>
           </div>
         )}
+        <style jsx>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     </div>
   )

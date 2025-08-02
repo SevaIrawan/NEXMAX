@@ -64,11 +64,9 @@ export default function BGOPage() {
   return (
     <Layout
       pageTitle="BGO"
-      subHeaderTitle="BGO"
+      subHeaderTitle=""
     >
-      <SubHeader title="" />
-      
-      <div className="text-center" style={{ marginTop: '50px' }}>
+      <div style={{ padding: '24px' }}>
         <h1 className="text-4xl font-bold text-gray-900 mb-4">
           🚧 Coming Soon
         </h1>

@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Layout from '@/components/Layout'
-import SubHeader from '@/components/SubHeader'
 import { supabase } from '@/lib/supabase'
+import { validateSession, cleanupSession } from '@/utils/sessionCleanup'
 
 interface User {
   id: string
@@ -29,17 +29,17 @@ export default function UsersPage() {
     password: '',
     role: 'user'
   })
+  const [authLoading, setAuthLoading] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
-    // Check authentication
-    const session = localStorage.getItem('nexmax_session')
-    if (!session) {
+    // Check authentication using utility function
+    const sessionData = validateSession()
+    if (!sessionData) {
       router.push('/login')
       return
     }
 
-    const sessionData = JSON.parse(session)
     setUser(sessionData)
     
     // Check dark mode preference
@@ -51,7 +51,8 @@ export default function UsersPage() {
 
     // Fetch users after authentication
     fetchUsers()
-  }, [router])
+    setAuthLoading(false)
+  }, []) // Remove router from dependency to prevent re-runs
 
   const fetchUsers = async () => {
     try {
@@ -82,14 +83,7 @@ export default function UsersPage() {
   }
 
   const handleLogout = () => {
-    try {
-      localStorage.removeItem('nexmax_session')
-      document.cookie = 'user_id=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT'
-      document.cookie = 'username=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT'
-      document.cookie = 'user_role=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT'
-    } catch (error) {
-      console.error('Logout error:', error)
-    }
+    cleanupSession()
     router.push('/login')
   }
 
@@ -228,6 +222,52 @@ export default function UsersPage() {
     }
   }
 
+  if (authLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        background: 'linear-gradient(135deg, #1a1d29 0%, #2d3142 50%, #1a1d29 100%)',
+        color: 'white',
+        fontFamily: 'Arial, sans-serif'
+      }}>
+        <div style={{
+          textAlign: 'center',
+          padding: '2rem'
+        }}>
+          <div style={{
+            fontSize: '3rem',
+            marginBottom: '1rem',
+            animation: 'pulse 2s infinite'
+          }}>
+            ⚡
+          </div>
+          <h1 style={{
+            fontSize: '2rem',
+            marginBottom: '1rem',
+            color: '#ffd700'
+          }}>
+            NEXMAX Dashboard
+          </h1>
+          <p style={{
+            fontSize: '1.1rem',
+            opacity: 0.8
+          }}>
+            Loading...
+          </p>
+        </div>
+        <style jsx>{`
+          @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+          }
+        `}</style>
+      </div>
+    )
+  }
+
   if (!user) {
     return null
   }
@@ -235,22 +275,20 @@ export default function UsersPage() {
   return (
     <Layout
       pageTitle="Users"
-      subHeaderTitle="User Management"
+      subHeaderTitle=""
     >
-      <SubHeader title="User Management" />
-      
-      <div className="table-container">
-        <div className="table-header">
-          <h2 className="table-title">Users List</h2>
-          <button 
-            onClick={() => setShowModal(true)}
-            className="add-user-btn"
-          >
-            Add New User
-          </button>
-        </div>
-        
-        <div style={{ padding: '20px' }}>
+      <div style={{ padding: '24px' }}>
+        <div className="table-container">
+          <div className="table-header">
+            <h2 className="table-title">Users List</h2>
+            <button 
+              onClick={() => setShowModal(true)}
+              className="add-user-btn"
+            >
+              Add New User
+            </button>
+          </div>
+          
           <table className="users-table">
             <thead>
               <tr>

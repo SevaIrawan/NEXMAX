@@ -2,204 +2,369 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
+import Image from 'next/image'
+
+// Supabase configuration with correct API key
+const supabaseUrl = 'https://bbuxfnchflhtulainndm.supabase.co'
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJidXhmbmNoZmxodHVsYWlubmRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4NDYzMjYsImV4cCI6MjA2OTQyMjMyNn0.AF6IiaeGB9-8FYZNKQsbnl5yZmSjBMj7Ag4eUunEbtc'
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 export default function LoginPage() {
-  const [isLogin, setIsLogin] = useState(true)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState('')
+  const [authLoading, setAuthLoading] = useState(true)
+  const [rememberMe, setRememberMe] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
-    // Check if already logged in
-    const session = localStorage.getItem('nexmax_session')
-    if (session) {
-      router.push('/dashboard')
+    // Check if user is already logged in
+    const checkAuth = async () => {
+      try {
+        const user = localStorage.getItem('nexmax_session')
+        if (user) {
+          try {
+            JSON.parse(user) // Validate JSON
+            router.push('/dashboard')
+          } catch (error) {
+            console.error('Invalid session data:', error)
+            localStorage.removeItem('nexmax_session')
+          }
+        }
+      } catch (error) {
+        console.error('Auth check error:', error)
+      } finally {
+        setAuthLoading(false)
+      }
     }
-  }, [router])
+
+    checkAuth()
+  }, []) // Remove router from dependency to prevent re-runs
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setMessage('')
+    setError('')
 
     try {
-      if (isLogin) {
-        // Login dengan Supabase
-        console.log('Attempting login with Supabase...')
-        
-        const { data, error } = await supabase
-          .from('users')
-          .select('*')
-          .eq('username', username)
-          .eq('password', password)
-          .single()
+      // Query users table to check credentials
+      const { data: users, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('username', username)
+        .eq('password', password)
+        .single()
 
-        if (error) {
-          console.log('Login error:', error)
-          setMessage('Username atau password salah')
-        } else if (data) {
-          console.log('Login successful:', data)
-          
-          // Create session
-          const sessionData = {
-            id: data.id,
-            username: data.username,
-            role: data.role,
-            timestamp: new Date().toISOString()
-          }
-          localStorage.setItem('nexmax_session', JSON.stringify(sessionData))
-          router.push('/dashboard')
-        } else {
-          setMessage('Username atau password salah')
-        }
-      } else {
-        // Registration dengan Supabase
-        console.log('Attempting registration with Supabase...')
-        
-        const { data, error } = await supabase
-          .from('users')
-          .insert([
-            {
-              username,
-              password, // In production, hash this password
-              role: 'user'
-            }
-          ])
-          .select()
-
-        if (error) {
-          console.log('Registration error:', error)
-          if (error.code === '23505') {
-            setMessage('Username sudah digunakan')
-          } else {
-            setMessage('Error saat registrasi: ' + error.message)
-          }
-        } else {
-          console.log('Registration successful:', data)
-          setMessage('Registrasi berhasil! Silakan login.')
-          setIsLogin(true)
-          setUsername('')
-          setPassword('')
-        }
+      if (error || !users) {
+        setError('Invalid username or password')
+        setLoading(false)
+        return
       }
-    } catch (error) {
-      console.log('System error:', error)
-      setMessage('Terjadi kesalahan sistem')
-    } finally {
+
+      // Store user data in localStorage
+      localStorage.setItem('nexmax_session', JSON.stringify({
+        id: users.id,
+        username: users.username,
+        role: users.role,
+        email: users.email
+      }))
+
+      // Redirect to dashboard
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 100)
+
+    } catch (err) {
+      console.error('Login error:', err)
+      setError('Connection error. Please try again.')
       setLoading(false)
     }
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            NexMax Dashboard
-          </h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
-            {isLogin ? 'Masuk ke dashboard' : 'Daftar akun baru'}
-          </p>
+  if (authLoading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #87CEEB 0%, #4682B4 100%)',
+        color: 'white'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            border: '4px solid rgba(255, 255, 255, 0.3)',
+            borderTop: '4px solid #fbbf24',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 16px'
+          }}></div>
+          <p>Loading...</p>
         </div>
+      </div>
+    )
+  }
 
-        <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Username
-              </label>
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'linear-gradient(135deg, #87CEEB 0%, #4682B4 100%)',
+      padding: '20px',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    }}>
+      <div style={{
+        background: 'rgba(255, 255, 255, 0.95)',
+        padding: '40px',
+        borderRadius: '20px',
+        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3), 0 8px 20px rgba(0, 0, 0, 0.2)',
+        width: '100%',
+        maxWidth: '400px',
+        position: 'relative',
+        zIndex: 1,
+        backdropFilter: 'blur(10px)',
+        border: '1px solid rgba(255, 255, 255, 0.2)'
+      }}>
+        <form onSubmit={handleSubmit}>
+          {/* Logo Section */}
+          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+            <div style={{
+              width: '80px',
+              height: '80px',
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 20px',
+              border: '3px solid #fbbf24',
+              boxShadow: '0 4px 15px rgba(251, 191, 36, 0.3)',
+              position: 'relative'
+            }}>
+              <Image
+                src="/aset/images (1).jpg"
+                alt="NEXMAX Logo"
+                width={50}
+                height={50}
+                style={{
+                  borderRadius: '50%',
+                  objectFit: 'cover'
+                }}
+              />
+            </div>
+          </div>
+          
+          <h2 style={{
+            textAlign: 'center',
+            marginBottom: '8px',
+            color: '#0f766e',
+            fontWeight: '600',
+            fontSize: '24px'
+          }}>Welcome Back</h2>
+          
+          <p style={{
+            textAlign: 'center',
+            color: '#6b7280',
+            marginBottom: '30px',
+            fontSize: '14px'
+          }}>Sign in to your account</p>
+
+          {error && (
+            <div style={{
+              background: '#ef4444',
+              color: 'white',
+              padding: '12px',
+              borderRadius: '8px',
+              marginBottom: '20px',
+              textAlign: 'center',
+              fontSize: '14px'
+            }}>
+              {error}
+            </div>
+          )}
+
+          <div style={{ marginBottom: '20px' }}>
+            <div style={{
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center'
+            }}>
+              <div style={{
+                position: 'absolute',
+                left: '12px',
+                color: '#0f766e',
+                fontSize: '18px'
+              }}>
+                👤
+              </div>
               <input
                 id="username"
                 type="text"
-                required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                placeholder="Masukkan username"
+                placeholder="Username"
+                required
+                autoComplete="off"
+                disabled={loading}
+                style={{
+                  width: '100%',
+                  padding: '16px 16px 16px 45px',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '12px',
+                  fontSize: '16px',
+                  transition: 'all 0.3s ease',
+                  boxSizing: 'border-box',
+                  background: 'rgba(255, 255, 255, 0.8)',
+                  outline: 'none'
+                }}
               />
             </div>
+          </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white pr-10"
-                  placeholder="Masukkan password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                >
-                  {showPassword ? (
-                    <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                    </svg>
-                  ) : (
-                    <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  )}
-                </button>
+          <div style={{ marginBottom: '20px' }}>
+            <div style={{
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center'
+            }}>
+              <div style={{
+                position: 'absolute',
+                left: '12px',
+                color: '#0f766e',
+                fontSize: '18px'
+              }}>
+                🔒
               </div>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                required
+                autoComplete="off"
+                disabled={loading}
+                style={{
+                  width: '100%',
+                  padding: '16px 16px 16px 45px',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '12px',
+                  fontSize: '16px',
+                  transition: 'all 0.3s ease',
+                  boxSizing: 'border-box',
+                  background: 'rgba(255, 255, 255, 0.8)',
+                  outline: 'none'
+                }}
+              />
             </div>
-
-            {message && (
-              <div className={`p-3 rounded-md text-sm ${
-                message.includes('berhasil') || message.includes('success')
-                  ? 'bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-200'
-                  : 'bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-200'
-              }`}>
-                {message}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Loading...' : (isLogin ? 'Masuk' : 'Daftar')}
-            </button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => {
-                setIsLogin(!isLogin)
-                setMessage('')
-                setUsername('')
-                setPassword('')
-              }}
-              className="text-blue-600 hover:text-blue-500 text-sm"
-            >
-              {isLogin ? 'Belum punya akun? Daftar' : 'Sudah punya akun? Masuk'}
-            </button>
           </div>
 
-          {/* Debug info */}
-          <div className="mt-4 p-3 bg-gray-100 dark:bg-gray-700 rounded text-xs">
-            <p className="text-gray-600 dark:text-gray-400">
-              <strong>Debug Info:</strong><br/>
-              Username: admin<br/>
-              Password: Admin123!<br/>
-              Status: Connected to Supabase
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '25px'
+          }}>
+            <label style={{
+              display: 'flex',
+              alignItems: 'center',
+              color: '#0f766e',
+              fontSize: '14px',
+              cursor: 'pointer'
+            }}>
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                style={{
+                  marginRight: '8px',
+                  accentColor: '#0f766e'
+                }}
+              />
+              Remember me
+            </label>
+            <a href="#" style={{
+              color: '#0f766e',
+              fontSize: '14px',
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center'
+            }}>
+              📧 Forget Password
+            </a>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: '100%',
+              padding: '16px',
+              background: 'linear-gradient(135deg, #0f766e, #134e4a)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '12px',
+              fontSize: '16px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              opacity: loading ? 0.6 : 1
+            }}
+          >
+            {loading ? 'Signing In...' : 'Login'}
+          </button>
+
+          <div style={{
+            marginTop: '20px',
+            padding: '16px',
+            background: 'rgba(15, 118, 110, 0.1)',
+            borderRadius: '8px',
+            borderLeft: '4px solid #0f766e'
+          }}>
+            <p style={{
+              margin: '0 0 12px 0',
+              fontWeight: '600',
+              color: '#0f766e',
+              fontSize: '14px'
+            }}>
+              Demo Credentials:
             </p>
+            <div style={{
+              marginBottom: '8px',
+              fontSize: '13px',
+              color: '#6b7280'
+            }}>
+              <strong style={{ color: '#0f766e' }}>Admin:</strong> admin / Admin123!
+            </div>
+            <div style={{
+              fontSize: '13px',
+              color: '#6b7280'
+            }}>
+              <strong style={{ color: '#0f766e' }}>Manager:</strong> manager / Manager2024!@#
+            </div>
           </div>
-        </div>
+        </form>
       </div>
+
+      <style jsx global>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
+        body {
+          margin: 0;
+          padding: 0;
+        }
+      `}</style>
     </div>
   )
 } 

@@ -16,13 +16,16 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #f8f9fa;
+  overflow: hidden; /* Prevent body scroll */
 }
 
 /* Layout utama */
 .main-container {
   display: flex;
-  min-height: 100vh;
+  height: 100vh; /* Fixed height - no scroll */
+  width: 100vw; /* Fixed width - no scroll */
   background-color: #f8f9fa;
+  overflow: hidden; /* No scroll for main container */
 }
 
 /* Sidebar */
@@ -32,10 +35,10 @@ body {
   top: 0;
   height: 100vh;
   width: 250px;
-  background-color: #1f2937;
+  background-color: #1f2937; /* Dark blue background */
   color: white;
   z-index: 1000;
-  overflow: hidden;
+  overflow: hidden; /* NO SCROLL for sidebar */
   display: flex;
   flex-direction: column;
   transition: width 0.3s ease;
@@ -45,13 +48,37 @@ body {
   width: 80px;
 }
 
+/* Sidebar menu items - NO SCROLL */
+.sidebar-menu {
+  flex: 1;
+  overflow: hidden; /* NO SCROLL for main menu */
+}
+
+/* Custom Scrollbar Styling for SUBMENU ONLY */
+.sidebar-submenu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-submenu::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+.sidebar-submenu::-webkit-scrollbar-thumb {
+  background: #4a5568; /* Dark gray */
+  border-radius: 3px;
+}
+
+.sidebar-submenu::-webkit-scrollbar-thumb:hover {
+  background: #718096; /* Lighter gray on hover */
+}
+
 /* Header */
 .header {
   position: fixed;
   top: 0;
   left: 250px;
   right: 0;
-  height: 80px;
+  height: 90px;
   background-color: #1f2937;
   color: white;
   border-bottom: 1px solid #374151;
@@ -61,6 +88,7 @@ body {
   justify-content: space-between;
   padding: 0 24px;
   transition: left 0.3s ease;
+  overflow: hidden; /* NO SCROLL for header */
 }
 
 .header.collapsed {
@@ -70,7 +98,7 @@ body {
 /* Sub Header */
 .subheader {
   position: fixed;
-  top: 80px;
+  top: 90px;
   left: 250px;
   right: 0;
   height: 60px;
@@ -81,36 +109,34 @@ body {
   align-items: center;
   padding: 0 24px;
   transition: left 0.3s ease;
+  overflow: hidden; /* NO SCROLL for subheader */
 }
 
 .subheader.collapsed {
   left: 80px;
 }
 
-/* Main Content - FULL AREA */
+/* Main Content - AUTO FIT IN ONE FRAME */
 .main-content {
-  margin-left: 250px;
-  margin-right: 0; /* NO RIGHT MARGIN */
-  margin-top: 80px; /* Only header height */
-  padding: 0; /* NO PADDING - FULL AREA */
-  min-height: calc(100vh - 80px);
-  height: auto;
+  position: fixed;
+  top: 80px; /* Header height */
+  left: 250px;
+  right: 0;
+  bottom: 0;
   background-color: #f8f9fa;
-  transition: margin-left 0.3s ease;
-  overflow: auto;
-  width: calc(100vw - 250px); /* FULL WIDTH MINUS SIDEBAR */
+  transition: left 0.3s ease;
+  overflow: auto; /* Scroll only for main content */
+  width: calc(100vw - 250px);
 }
 
 .main-content.collapsed {
-  margin-left: 80px;
-  width: calc(100vw - 80px); /* FULL WIDTH MINUS COLLAPSED SIDEBAR */
+  left: 80px;
+  width: calc(100vw - 80px);
 }
 
 /* When subheader exists */
 .subheader + .main-content {
-  margin-top: 140px; /* 80px header + 60px subheader */
-  min-height: calc(100vh - 140px);
-  height: auto;
+  top: 140px; /* 80px header + 60px subheader */
 }
 
 /* KPI Cards */
@@ -119,6 +145,7 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 24px;
   margin-bottom: 32px;
+  padding: 24px;
 }
 
 .kpi-card {
@@ -217,7 +244,8 @@ body {
   }
   
   .main-content {
-    margin-left: 80px;
+    left: 80px;
+    width: calc(100vw - 80px);
   }
   
   .kpi-grid {

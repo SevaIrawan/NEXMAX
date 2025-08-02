@@ -3,7 +3,13 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    domains: ['via.placeholder.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
+      },
+    ],
+    unoptimized: true,
   },
   env: {
     SUPABASE_URL: 'https://bbuxfnchflhtulainndm.supabase.co',
